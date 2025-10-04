@@ -1,0 +1,782 @@
+[
+  {
+    "id": "712-time-delay-01",
+    "age_band": "7-12",
+    "domain": "time",
+    "difficulty": 1,
+    "stem": "You can have 1 cookie right now, or you can wait until after lunch and have 3 cookies. Which choice gets you more cookies in total?",
+    "options": [
+      { "id": "A", "text": "Take 1 cookie now", "class": "developing", "score_delta": 1 },
+      { "id": "B", "text": "Wait and get 3 cookies after lunch", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "It doesn't matter which I choose", "class": "developing", "score_delta": 1 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": 0, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "712-social-fairness-01",
+    "age_band": "7-12",
+    "domain": "social",
+    "difficulty": 1,
+    "stem": "Two classmates worked together on a project. One student did 70% of the work, and the other did 30%. How should the teacher grade them?",
+    "options": [
+      { "id": "A", "text": "Give both students equal marks because that's always fair", "class": "developing", "score_delta": 1 },
+      { "id": "B", "text": "Give grades that reflect how much work each student did", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "Let the teacher decide without input from students", "class": "proficient", "score_delta": 2 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": 0, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "712-evidence-marbles-01",
+    "age_band": "7-12",
+    "domain": "evidence",
+    "difficulty": 1,
+    "stem": "You will win a prize if you pick a blue marble from a bag. Which bag gives you a better chance of winning?",
+    "options": [
+      { "id": "A", "text": "Bag A: 9 red marbles and 1 blue marble", "class": "developing", "score_delta": 1 },
+      { "id": "B", "text": "Bag B: 1 red marble and 1 blue marble", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "Both bags give an equal chance", "class": "developing", "score_delta": 1 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": 0, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "712-risk-crossing-01",
+    "age_band": "7-12",
+    "domain": "risk",
+    "difficulty": 1,
+    "stem": "Which is the safer way to cross a busy street?",
+    "options": [
+      { "id": "A", "text": "Run across without looking", "class": "developing", "score_delta": 1 },
+      { "id": "B", "text": "Wait for the crossing signal and look both ways", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "It depends on how fast you can run", "class": "developing", "score_delta": 1 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": 0, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "712-meta-overconf-01",
+    "age_band": "7-12",
+    "domain": "metacognition",
+    "difficulty": 1,
+    "stem": "After reading just one page about dinosaurs, you take a 10-question quiz. How many questions do you think you'll answer correctly?",
+    "options": [
+      { "id": "A", "text": "All 10 questions - I'm confident I know everything", "class": "developing", "score_delta": 1 },
+      { "id": "B", "text": "Some questions right, some wrong - one page isn't enough to learn everything", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "I won't get any wrong", "class": "developing", "score_delta": 1 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": 0, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "1319-time-plan-01",
+    "age_band": "13-19",
+    "domain": "time",
+    "difficulty": 2,
+    "stem": "You're starting a new project that you think will take 2 weeks to complete. However, similar projects you've done in the past took 5-6 weeks. What's the best time estimate for this project?",
+    "options": [
+      { "id": "A", "text": "Stick with my estimate of 2 weeks", "class": "developing", "score_delta": 1 },
+      { "id": "B", "text": "Compromise at 3 weeks", "class": "proficient", "score_delta": 2 },
+      { "id": "C", "text": "Plan for 5-6 weeks based on past experience", "class": "mastery", "score_delta": 3 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": -1, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "1319-social-conform-01",
+    "age_band": "13-19",
+    "domain": "social",
+    "difficulty": 2,
+    "stem": "Your friends are pressuring you to participate in a risky prank. What should you do?",
+    "options": [
+      { "id": "A", "text": "Join in fully to keep your friends happy", "class": "developing", "score_delta": 1 },
+      { "id": "B", "text": "Participate but try to make it less risky", "class": "proficient", "score_delta": 2 },
+      { "id": "C", "text": "Decline and explain why it's not a good idea", "class": "mastery", "score_delta": 3 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": -1, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "1319-evidence-smallN-01",
+    "age_band": "13-19",
+    "domain": "evidence",
+    "difficulty": 2,
+    "stem": "Three of your friends tell you they made money through day-trading stocks. What's the best approach to take?",
+    "options": [
+      { "id": "A", "text": "That's good enough evidence - start day-trading", "class": "developing", "score_delta": 1 },
+      { "id": "B", "text": "Three examples isn't enough evidence - research thoroughly first", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "Assume it's clearly a bubble and avoid it completely", "class": "proficient", "score_delta": 2 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": -1, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "1319-risk-driving-01",
+    "age_band": "13-19",
+    "domain": "risk",
+    "difficulty": 2,
+    "stem": "You're driving late at night and feeling very tired. What's the safest action to take?",
+    "options": [
+      { "id": "A", "text": "Push through and keep driving - you'll be fine", "class": "developing", "score_delta": 1 },
+      { "id": "B", "text": "Open the windows and play loud music to stay alert", "class": "proficient", "score_delta": 2 },
+      { "id": "C", "text": "Pull over to a safe location and rest", "class": "mastery", "score_delta": 3 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": -1, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "1319-meta-reflect-01",
+    "age_band": "13-19",
+    "domain": "metacognition",
+    "difficulty": 2,
+    "stem": "You just received a failing grade on an important test. What's the best way to think about this situation?",
+    "options": [
+      { "id": "A", "text": "I'm just naturally bad at this subject", "class": "developing", "score_delta": 1 },
+      { "id": "B", "text": "I didn't study enough, but I can improve next time", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "The teacher is to blame for this", "class": "developing", "score_delta": 1 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": -1, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "712-time-homework-02",
+    "age_band": "7-12",
+    "domain": "time",
+    "difficulty": 2,
+    "stem": "You have a big school project that's due in 2 weeks. When should you start working on it?",
+    "options": [
+      { "id": "A", "text": "The night before it's due", "class": "developing", "score_delta": 1 },
+      { "id": "B", "text": "Start this week and break it into smaller parts", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "Starting next week is fine", "class": "proficient", "score_delta": 2 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": 0, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "712-social-sharing-02",
+    "age_band": "7-12",
+    "domain": "social",
+    "difficulty": 2,
+    "stem": "Your friend forgot their lunch at home. You have extra snacks in your bag. What do you do?",
+    "options": [
+      { "id": "A", "text": "Keep all the snacks for myself", "class": "developing", "score_delta": 1 },
+      { "id": "B", "text": "Share some of my snacks with my friend", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "Sell the snacks to my friend for money", "class": "developing", "score_delta": 1 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": 0, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "712-evidence-pattern-02",
+    "age_band": "7-12",
+    "domain": "evidence",
+    "difficulty": 2,
+    "stem": "You see someone win a game once. Does that mean they will always win?",
+    "options": [
+      { "id": "A", "text": "Yes, they're definitely the best player", "class": "developing", "score_delta": 1 },
+      { "id": "B", "text": "No, I need to see them play more games to know", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "Maybe, it depends on luck", "class": "proficient", "score_delta": 2 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": 0, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "712-risk-stranger-02",
+    "age_band": "7-12",
+    "domain": "risk",
+    "difficulty": 2,
+    "stem": "A stranger you don't know offers you candy and asks you to help find their lost puppy. What should you do?",
+    "options": [
+      { "id": "A", "text": "Go with them to help find the puppy", "class": "developing", "score_delta": 1 },
+      { "id": "B", "text": "Say no and immediately tell a trusted adult", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "Take the candy but don't help look for the puppy", "class": "developing", "score_delta": 1 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": 0, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "712-meta-guess-02",
+    "age_band": "7-12",
+    "domain": "metacognition",
+    "difficulty": 2,
+    "stem": "You're taking a quiz and you're not sure of the answer to a question. What's the best strategy?",
+    "options": [
+      { "id": "A", "text": "Guess randomly without thinking", "class": "proficient", "score_delta": 2 },
+      { "id": "B", "text": "Skip it for now and come back to it later", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "Leave it blank and don't answer it", "class": "developing", "score_delta": 1 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": 0, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "1319-time-distraction-02",
+    "age_band": "13-19",
+    "domain": "time",
+    "difficulty": 3,
+    "stem": "You need to study for an important test, but your friends keep texting about weekend plans. What's the most effective approach?",
+    "options": [
+      { "id": "A", "text": "Text back and forth while studying", "class": "developing", "score_delta": 1 },
+      { "id": "B", "text": "Focus on studying first, then respond to texts later", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "Send quick replies to texts while studying", "class": "proficient", "score_delta": 2 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": -1, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 0, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "1319-social-gossip-02",
+    "age_band": "13-19",
+    "domain": "social",
+    "difficulty": 3,
+    "stem": "You hear a rumor about someone you know. What's the most responsible action to take?",
+    "options": [
+      { "id": "A", "text": "Spread the rumor to others", "class": "developing", "score_delta": 1 },
+      { "id": "B", "text": "Verify if it's true first, or ignore it if you can't verify", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "Tell just your close friends about it", "class": "proficient", "score_delta": 2 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": -1, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 0, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "1319-evidence-correlation-02",
+    "age_band": "13-19",
+    "domain": "evidence",
+    "difficulty": 3,
+    "stem": "Data shows that ice cream sales and crime rates both increase during summer months. What can you conclude from this?",
+    "options": [
+      { "id": "A", "text": "Ice cream causes crime", "class": "developing", "score_delta": 1 },
+      { "id": "B", "text": "Correlation doesn't prove causation - there could be other factors", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "Crime causes ice cream sales", "class": "developing", "score_delta": 1 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": -1, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 0, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "1319-risk-investment-02",
+    "age_band": "13-19",
+    "domain": "risk",
+    "difficulty": 3,
+    "stem": "A cryptocurrency investment opportunity promises 500% returns in just 3 months. What's the smartest approach?",
+    "options": [
+      { "id": "A", "text": "Invest all my money right now", "class": "developing", "score_delta": 1 },
+      { "id": "B", "text": "Research thoroughly and be highly skeptical of the claims", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "Invest just a small amount to test it out", "class": "proficient", "score_delta": 2 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": -1, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 0, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "1319-meta-bias-02",
+    "age_band": "13-19",
+    "domain": "metacognition",
+    "difficulty": 3,
+    "stem": "You strongly believe something is true. Then you encounter evidence that contradicts your belief. How should you respond?",
+    "options": [
+      { "id": "A", "text": "Ignore the contradicting evidence", "class": "developing", "score_delta": 1 },
+      { "id": "B", "text": "Seriously consider that I might be wrong and examine the evidence", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "Look for other evidence that supports my original view", "class": "proficient", "score_delta": 2 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": -1, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 0, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "712-time-saving-03",
+    "age_band": "7-12",
+    "domain": "time",
+    "difficulty": 1,
+    "stem": "You want to buy a toy that costs $20. You receive $5 in allowance each week. How long will you need to save?",
+    "options": [
+      { "id": "A", "text": "1 week", "class": "developing", "score_delta": 1 },
+      { "id": "B", "text": "4 weeks", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "2 weeks", "class": "proficient", "score_delta": 2 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": 0, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "712-social-turns-03",
+    "age_band": "7-12",
+    "domain": "social",
+    "difficulty": 1,
+    "stem": "Three kids all want to play the same video game at the same time, but only one person can play. What's the fairest solution?",
+    "options": [
+      { "id": "A", "text": "The strongest kid should play first", "class": "developing", "score_delta": 1 },
+      { "id": "B", "text": "All three kids should take turns playing for equal amounts of time", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "The kid who owns the game should play the longest", "class": "proficient", "score_delta": 2 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": 0, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "712-evidence-experiment-03",
+    "age_band": "7-12",
+    "domain": "evidence",
+    "difficulty": 1,
+    "stem": "Plant A gets water and sunlight. Plant B gets only water (no sunlight). Is this a good test to see if plants need sunlight?",
+    "options": [
+      { "id": "A", "text": "Yes, this is a good test because we can compare the two plants", "class": "mastery", "score_delta": 3 },
+      { "id": "B", "text": "No, both plants need exactly the same treatment", "class": "developing", "score_delta": 1 },
+      { "id": "C", "text": "No, we need more plants to test", "class": "proficient", "score_delta": 2 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": 0, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "712-risk-bike-03",
+    "age_band": "7-12",
+    "domain": "risk",
+    "difficulty": 1,
+    "stem": "You want to ride your bike to a friend's house. What's the safest way to do this?",
+    "options": [
+      { "id": "A", "text": "Go without telling anyone where I'm going", "class": "developing", "score_delta": 1 },
+      { "id": "B", "text": "Tell my parents where I'm going and wear a helmet", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "Just tell my parents but don't worry about a helmet", "class": "proficient", "score_delta": 2 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": 0, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "712-meta-mistake-03",
+    "age_band": "7-12",
+    "domain": "metacognition",
+    "difficulty": 1,
+    "stem": "You make a mistake on your homework. What's the best way to learn from it?",
+    "options": [
+      { "id": "A", "text": "Hide the mistake and hope no one notices", "class": "developing", "score_delta": 1 },
+      { "id": "B", "text": "Take time to figure out what I did wrong and how to fix it", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "Quickly erase it without thinking about it", "class": "proficient", "score_delta": 2 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": 0, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "1319-time-sleep-03",
+    "age_band": "13-19",
+    "domain": "time",
+    "difficulty": 2,
+    "stem": "You have a big test tomorrow morning but you're feeling tired tonight. What approach will likely give you the best test result?",
+    "options": [
+      { "id": "A", "text": "Stay up all night studying", "class": "developing", "score_delta": 1 },
+      { "id": "B", "text": "Review the key points for an hour, then get a good night's sleep", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "Go to sleep now and cram in the morning", "class": "proficient", "score_delta": 2 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": -1, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "1319-social-credit-03",
+    "age_band": "13-19",
+    "domain": "social",
+    "difficulty": 2,
+    "stem": "Your group member didn't contribute any work to your team project. Now they're asking to share equal credit with everyone. What should you do?",
+    "options": [
+      { "id": "A", "text": "Give them full credit anyway to keep the peace", "class": "proficient", "score_delta": 2 },
+      { "id": "B", "text": "Have an honest discussion with the teacher about everyone's contributions", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "Exclude them completely from the credit", "class": "developing", "score_delta": 1 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": -1, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "1319-evidence-source-03",
+    "age_band": "13-19",
+    "domain": "evidence",
+    "difficulty": 2,
+    "stem": "You need to write a research paper for school. Which source is the most reliable to use?",
+    "options": [
+      { "id": "A", "text": "A random blog post you found online", "class": "developing", "score_delta": 1 },
+      { "id": "B", "text": "A peer-reviewed research paper from an academic journal", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "A Wikipedia article on the topic", "class": "proficient", "score_delta": 2 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": -1, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "1319-risk-party-03",
+    "age_band": "13-19",
+    "domain": "risk",
+    "difficulty": 2,
+    "stem": "You're at a party and someone offers you alcohol. What's the safest response?",
+    "options": [
+      { "id": "A", "text": "Accept it to fit in with everyone else", "class": "developing", "score_delta": 1 },
+      { "id": "B", "text": "Decline confidently and stick to your decision", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "Take it but pretend to drink without actually drinking", "class": "proficient", "score_delta": 2 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": -1, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "1319-meta-study-03",
+    "age_band": "13-19",
+    "domain": "metacognition",
+    "difficulty": 2,
+    "stem": "Which study technique is most effective for remembering information long-term?",
+    "options": [
+      { "id": "A", "text": "Re-reading your notes over and over", "class": "proficient", "score_delta": 2 },
+      { "id": "B", "text": "Testing yourself on the material without looking at notes", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "Highlighting everything important in different colors", "class": "developing", "score_delta": 1 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": -1, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "712-critical-assumptions-01",
+    "age_band": "7-12",
+    "domain": "critical",
+    "difficulty": 1,
+    "stem": "Your friend says: 'Everyone in our class loves pizza, so pizza is the best food ever.' What's wrong with this statement?",
+    "options": [
+      { "id": "A", "text": "Nothing is wrong, if everyone likes it then it's the best", "class": "developing", "score_delta": 1 },
+      { "id": "B", "text": "It assumes what's true for the class is true for everyone everywhere", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "Some people in the class might not actually like pizza", "class": "proficient", "score_delta": 2 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": 0, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "712-critical-cause-01",
+    "age_band": "7-12",
+    "domain": "critical",
+    "difficulty": 1,
+    "stem": "Maria noticed that every time she wears her lucky socks, her soccer team wins. She concludes that her socks cause the team to win. What's the problem with this thinking?",
+    "options": [
+      { "id": "A", "text": "Her socks are definitely helping the team win", "class": "developing", "score_delta": 1 },
+      { "id": "B", "text": "Just because two things happen together doesn't mean one causes the other", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "She should test this by wearing the socks to more games", "class": "proficient", "score_delta": 2 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": 0, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "712-critical-sources-01",
+    "age_band": "7-12",
+    "domain": "critical",
+    "difficulty": 1,
+    "stem": "You're researching healthy eating habits. Which source would give you the most reliable information?",
+    "options": [
+      { "id": "A", "text": "A video made by someone selling diet supplements", "class": "developing", "score_delta": 1 },
+      { "id": "B", "text": "A research study published by nutrition scientists", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "A popular blog written by your favorite celebrity", "class": "developing", "score_delta": 1 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": 0, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "712-critical-bias-01",
+    "age_band": "7-12",
+    "domain": "critical",
+    "difficulty": 2,
+    "stem": "A smartphone company claims 'Our phone is rated #1!' When you investigate, you discover their own employees did the rating. What critical thinking concept does this illustrate?",
+    "options": [
+      { "id": "A", "text": "This shows their employees are proud of their product", "class": "developing", "score_delta": 1 },
+      { "id": "B", "text": "This demonstrates conflict of interest and potential bias", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "Employees would know the phone best, so the rating is valid", "class": "proficient", "score_delta": 2 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": 0, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "712-critical-arguments-01",
+    "age_band": "7-12",
+    "domain": "critical",
+    "difficulty": 2,
+    "stem": "Someone argues: 'We should ban homework because I don't like it and neither do my friends.' What makes this a weak argument?",
+    "options": [
+      { "id": "A", "text": "Personal feelings and limited examples aren't strong evidence for a major policy change", "class": "mastery", "score_delta": 3 },
+      { "id": "B", "text": "It's weak because homework is actually good for learning", "class": "proficient", "score_delta": 2 },
+      { "id": "C", "text": "Nothing is wrong, if students don't like it then it should be banned", "class": "developing", "score_delta": 1 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": 0, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "712-critical-relevance-01",
+    "age_band": "7-12",
+    "domain": "critical",
+    "difficulty": 2,
+    "stem": "During a debate about whether to extend library hours, someone says: 'The librarian has worked here for 20 years, so we should listen to them.' What's the issue with this reasoning?",
+    "options": [
+      { "id": "A", "text": "Experience doesn't automatically make someone's opinion more valid on every issue", "class": "proficient", "score_delta": 2 },
+      { "id": "B", "text": "Years of experience can indicate expertise, but the argument should focus on evidence about library needs, not just authority", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "Nothing is wrong, experienced people always know best", "class": "developing", "score_delta": 1 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": 0, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "712-critical-fallacy-01",
+    "age_band": "7-12",
+    "domain": "critical",
+    "difficulty": 3,
+    "stem": "A politician argues: 'My opponent wants to reduce military spending. They obviously don't care about our country's safety.' What logical fallacy is this?",
+    "options": [
+      { "id": "A", "text": "False dilemma - assuming there are only two extreme positions with no middle ground", "class": "mastery", "score_delta": 3 },
+      { "id": "B", "text": "This is a valid argument showing the opponent's true intentions", "class": "developing", "score_delta": 1 },
+      { "id": "C", "text": "It's unfair because it attacks the person instead of their ideas", "class": "proficient", "score_delta": 2 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": 0, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "712-critical-slippery-01",
+    "age_band": "7-12",
+    "domain": "critical",
+    "difficulty": 3,
+    "stem": "Someone says: 'If we allow students to redo one test, soon they'll want to redo all tests, then all assignments, and eventually no one will do any work at all.' What's the flaw in this reasoning?",
+    "options": [
+      { "id": "A", "text": "Slippery slope fallacy - assuming one small change will inevitably lead to extreme consequences without evidence", "class": "mastery", "score_delta": 3 },
+      { "id": "B", "text": "They're right - students would definitely take advantage of this policy", "class": "developing", "score_delta": 1 },
+      { "id": "C", "text": "The argument exaggerates possible outcomes", "class": "proficient", "score_delta": 2 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": 0, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  },
+  {
+    "id": "712-critical-analysis-01",
+    "age_band": "7-12",
+    "domain": "critical",
+    "difficulty": 3,
+    "stem": "You read: 'Studies show that people who drink coffee live longer. Therefore, everyone should drink coffee to extend their life.' What critical analysis reveals the problem?",
+    "options": [
+      { "id": "A", "text": "Coffee must have special health properties that extend life", "class": "developing", "score_delta": 1 },
+      { "id": "B", "text": "Correlation doesn't prove causation - many factors could explain this, and individual health varies", "class": "mastery", "score_delta": 3 },
+      { "id": "C", "text": "The studies might not be recent or accurate", "class": "proficient", "score_delta": 2 }
+    ],
+    "key": { "optimal_class": "mastery" },
+    "routing_rules": {
+      "on_developing": { "age_shift": 0, "difficulty_shift": -1, "domain_bias_sample": "same" },
+      "on_proficient": { "age_shift": 0, "difficulty_shift": 0, "domain_bias_sample": "rotate" },
+      "on_mastery": { "age_shift": 1, "difficulty_shift": 1, "domain_bias_sample": "same" },
+      "min_domain_repeats": 2,
+      "cooldown_ids": []
+    }
+  }
+]
