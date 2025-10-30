@@ -208,10 +208,15 @@ function stripHtml_(s) {
   return String(s || '').replace(/<[^>]*>/g, '');
 }
 
+function logError_(message, error) {
+  console.error(message, error);
+  Logger.log(message + ': ' + (error ? error.toString() : 'unknown error'));
+}
+
 function createResponse_(obj, statusCode) {
   const out = ContentService.createTextOutput(JSON.stringify(obj));
   out.setMimeType(ContentService.MimeType.JSON);
-  // Apps Script doesn’t allow arbitrary headers here. Status code is set by HtmlService only,
+  // Apps Script doesn't allow arbitrary headers here. Status code is set by HtmlService only,
   // but ContentService always returns 200. We include a status field in JSON for clients if needed.
   return out;
 }
