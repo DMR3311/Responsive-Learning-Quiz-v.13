@@ -1,5 +1,5 @@
 export const sendToGoogleSheets = async (data) => {
-  const GOOGLE_APPS_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SHEETS_WEBHOOK_URL || '';
+  const GOOGLE_APPS_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SHEETS_WEBHOOK_URL || 'https://script.google.com/macros/s/AKfycbwN3B4td-NV2PEC0bn_ARjXFOOWtOZAQ29OxHIgXkTzppAxMTNtFfe76uQV_z8UzaI/exec';
 
   console.log('Google Sheets Webhook URL:', GOOGLE_APPS_SCRIPT_URL);
 

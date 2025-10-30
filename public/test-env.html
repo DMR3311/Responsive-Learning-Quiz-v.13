@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Environment Variable Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .status {
+      padding: 20px;
+      border-radius: 5px;
+      margin: 20px 0;
+    }
+    .success {
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+    }
+    .error {
+      background: #f8d7da;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+    }
+    .info {
+      background: #d1ecf1;
+      border: 1px solid #bee5eb;
+      color: #0c5460;
+    }
+    pre {
+      background: #f4f4f4;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+    }
+    button {
+      background: #F72585;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 20px;
+    }
+    button:hover {
+      background: #d61f6f;
+    }
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Google Sheets Integration Test</h1>
+
+    <div id="envCheck" class="status info">
+      Checking environment configuration...
+    </div>
+
+    <div id="details"></div>
+
+    <button id="testBtn" onclick="testSubmission()" disabled>
+      Send Test Submission
+    </button>
+
+    <div id="testResult"></div>
+  </div>
+
+  <script type="module">
+    // Check if environment variable is set
+    const webhookUrl = import.meta.env.VITE_GOOGLE_SHEETS_WEBHOOK_URL;
+    const envCheck = document.getElementById('envCheck');
+    const details = document.getElementById('details');
+    const testBtn = document.getElementById('testBtn');
+
+    if (!webhookUrl) {
+      envCheck.className = 'status error';
+      envCheck.innerHTML = `
+        <strong>❌ Environment Variable NOT Configured</strong>
+        <p>The VITE_GOOGLE_SHEETS_WEBHOOK_URL environment variable is not set.</p>
+      `;
+
+      details.innerHTML = `
+        <h3>How to Fix:</h3>
+        <ol>
+          <li>Go to your hosting platform dashboard (Netlify/Vercel)</li>
+          <li>Navigate to Environment Variables settings</li>
+          <li>Add a new variable:
+            <ul>
+              <li><strong>Key:</strong> <code>VITE_GOOGLE_SHEETS_WEBHOOK_URL</code></li>
+              <li><strong>Value:</strong> Your Google Apps Script web app URL</li>
+            </ul>
+          </li>
+          <li>Redeploy your site</li>
+          <li>Refresh this page to test again</li>
+        </ol>
+      `;
+    } else {
+      envCheck.className = 'status success';
+      envCheck.innerHTML = `
+        <strong>✅ Environment Variable Configured</strong>
+        <p>Webhook URL is set and ready to use.</p>
+      `;
+
+      details.innerHTML = `
+        <h3>Configuration Details:</h3>
+        <pre>${webhookUrl}</pre>
+        <p>Click the button below to send a test submission to Google Sheets.</p>
+      `;
+
+      testBtn.disabled = false;
+    }
+
+    window.testSubmission = async function() {
+      const testResult = document.getElementById('testResult');
+      const testBtn = document.getElementById('testBtn');
+
+      testBtn.disabled = true;
+      testBtn.textContent = 'Sending...';
+
+      testResult.className = 'status info';
+      testResult.innerHTML = '<p>Sending test data to Google Sheets...</p>';
+
+      const testData = {
+        name: "Test User",
+        email: "test@example.com",
+        results_json: {
+          version: "v1.0",
+          score: "15/20",
+          html_report: "<html><body><h1>Test Report</h1></body></html>",
+          summary: {
+            accuracy: 75,
+            mode: "practice",
+            total_questions: 10,
+            mastery_answers: 7,
+            proficient_answers: 2,
+            developing_answers: 1,
+            avg_time_ms: 15000,
+            duration_sec: 150,
+            domains: []
+          },
+          detailed_history: []
+        }
+      };
+
+      try {
+        const response = await fetch(webhookUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(testData),
+          mode: 'no-cors'
+        });
+
+        testResult.className = 'status success';
+        testResult.innerHTML = `
+          <strong>✅ Request Sent Successfully</strong>
+          <p>Due to no-cors mode, we can't verify the response, but the request was sent.</p>
+          <p><strong>Next step:</strong> Check your Google Sheet to see if a new row was added with test data.</p>
+          <h4>Data Sent:</h4>
+          <pre>${JSON.stringify(testData, null, 2)}</pre>
+        `;
+      } catch (error) {
+        testResult.className = 'status error';
+        testResult.innerHTML = `
+          <strong>❌ Error Sending Request</strong>
+          <p>${error.message}</p>
+        `;
+      } finally {
+        testBtn.disabled = false;
+        testBtn.textContent = 'Send Test Submission';
+      }
+    };
+  </script>
+</body>
+</html>
