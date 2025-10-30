@@ -7,15 +7,12 @@ export const sendToGoogleSheets = async (data) => {
   }
 
   try {
-    const formData = new FormData();
-
-    Object.entries(data).forEach(([key, value]) => {
-      formData.append(key, typeof value === 'object' ? JSON.stringify(value) : value);
-    });
-
-    await fetch(GOOGLE_APPS_SCRIPT_URL, {
+    const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
       method: 'POST',
-      body: formData,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
       mode: 'no-cors'
     });
 
@@ -28,7 +25,7 @@ export const sendToGoogleSheets = async (data) => {
 
 export const formatQuizDataForSheets = (user, mode, history, finalScore, questionTimes) => {
   const userName = user?.isGuest ? 'Guest' : (user?.email || 'Unknown');
-  const timestamp = new Date().toISOString();
+  const userEmail = user?.email || 'guest@example.com';
   const totalQuestions = history.length;
   const optimalAnswers = history.filter(h => h.answerClass === 'mastery').length;
   const avgTime = questionTimes.length > 0
@@ -46,17 +43,26 @@ export const formatQuizDataForSheets = (user, mode, history, finalScore, questio
     return acc;
   }, {});
 
+  const domainStats = Object.entries(domainBreakdown).map(([domain, stats]) => ({
+    id: domain,
+    pct: Math.round((stats.optimal / stats.total) * 100)
+  }));
+
   return {
-    'entry.1275479195': timestamp,
-    'entry.2073083002': userName,
-    'entry.115684590': mode,
-    'entry.2127587595': finalScore,
-    'entry.945932637': totalQuestions,
-    'entry.972441326': optimalAnswers,
-    'entry.137391057': avgTime,
-    'entry.2014439510': Object.entries(domainBreakdown)
-      .map(([domain, stats]) => `${domain}: ${stats.optimal}/${stats.total}`)
-      .join(', '),
-    'entry.1901019359': JSON.stringify(history)
+    name: userName,
+    email: userEmail,
+    results_json: {
+      version: 'v1.0',
+      score: finalScore,
+      mode: mode,
+      total_questions: totalQuestions,
+      optimal_answers: optimalAnswers,
+      avg_time: avgTime,
+      domains: domainStats,
+      raw: history,
+      duration_sec: Math.round((questionTimes.reduce((a, b) => a + b, 0)) / 1000)
+    },
+    source_url: window.location.href,
+    user_agent: navigator.userAgent
   };
 };
