@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Google Sheets Integration Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            white-space: pre-wrap;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>Google Sheets Integration Diagnostic</h1>
+
+    <div class="test-section">
+        <h2>Test 1: GET Request (Health Check)</h2>
+        <button onclick="testHealthCheck()">Test Health Check</button>
+        <div id="health-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: POST with minimal payload</h2>
+        <button onclick="testMinimalPayload()">Test Minimal POST</button>
+        <div id="minimal-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: POST with full quiz data</h2>
+        <button onclick="testFullPayload()">Test Full Quiz Data</button>
+        <div id="full-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 4: Check spreadsheet access</h2>
+        <p>Spreadsheet ID: <code>1Dtp2HWlVhtPHxfH2aESoN2xT-gMo4jSrJzuvmpSUbDk</code></p>
+        <a href="https://docs.google.com/spreadsheets/d/1Dtp2HWlVhtPHxfH2aESoN2xT-gMo4jSrJzuvmpSUbDk/edit" target="_blank">
+            <button>Open Spreadsheet</button>
+        </a>
+    </div>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwN3B4td-NV2PEC0bn_ARjXFOOWtOZAQ29OxHIgXkTzppAxMTNtFfe76uQV_z8UzaI/exec';
+
+        function log(elementId, message, type = 'info') {
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.className = `result ${type}`;
+        }
+
+        async function testHealthCheck() {
+            log('health-result', 'Testing...', 'info');
+            try {
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'GET'
+                });
+                const text = await response.text();
+                log('health-result', `Status: ${response.status}\nResponse: ${text}`, 'success');
+            } catch (error) {
+                log('health-result', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testMinimalPayload() {
+            log('minimal-result', 'Testing...', 'info');
+            const payload = {
+                name: "Test User",
+                email: "test@example.com",
+                results_json: {
+                    version: "v1.0",
+                    score: "10/20"
+                }
+            };
+
+            try {
+                console.log('Sending minimal payload:', payload);
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                console.log('Response:', result);
+                log('minimal-result',
+                    `Status: ${response.status}\n` +
+                    `Response: ${JSON.stringify(result, null, 2)}\n` +
+                    `Payload size: ${JSON.stringify(payload).length} bytes`,
+                    response.ok ? 'success' : 'error'
+                );
+            } catch (error) {
+                console.error('Error:', error);
+                log('minimal-result', `Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testFullPayload() {
+            log('full-result', 'Testing...', 'info');
+            const payload = {
+                name: "Test User Full",
+                email: "testfull@example.com",
+                results_json: {
+                    version: "v1.0",
+                    score: "24/30",
+                    summary: {
+                        accuracy: 80,
+                        mode: "practice",
+                        total_questions: 30,
+                        mastery_answers: 24,
+                        proficient_answers: 4,
+                        developing_answers: 2,
+                        avg_time_ms: 15000,
+                        duration_sec: 450,
+                        domains: [
+                            {
+                                domain: "logic",
+                                accuracy: 85,
+                                mastery: 17,
+                                proficient: 2,
+                                developing: 1,
+                                total: 20,
+                                score_delta: 45
+                            },
+                            {
+                                domain: "probability",
+                                accuracy: 70,
+                                mastery: 7,
+                                proficient: 2,
+                                developing: 1,
+                                total: 10,
+                                score_delta: 18
+                            }
+                        ]
+                    },
+                    detailed_history: [
+                        { domain: "logic", difficulty: 2, answer_class: "mastery", score_delta: 3 },
+                        { domain: "logic", difficulty: 1, answer_class: "proficient", score_delta: 1 },
+                        { domain: "probability", difficulty: 3, answer_class: "mastery", score_delta: 5 }
+                    ]
+                }
+            };
+
+            try {
+                console.log('Sending full payload:', payload);
+                const payloadSize = JSON.stringify(payload).length;
+                console.log('Payload size:', payloadSize, 'bytes');
+
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                console.log('Response:', result);
+                log('full-result',
+                    `Status: ${response.status}\n` +
+                    `Response: ${JSON.stringify(result, null, 2)}\n` +
+                    `Payload size: ${payloadSize} bytes`,
+                    response.ok ? 'success' : 'error'
+                );
+            } catch (error) {
+                console.error('Error:', error);
+                log('full-result', `Error: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

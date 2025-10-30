@@ -1,14 +1,16 @@
 export const sendToGoogleSheets = async (data) => {
   const GOOGLE_APPS_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SHEETS_WEBHOOK_URL || 'https://script.google.com/macros/s/AKfycbwN3B4td-NV2PEC0bn_ARjXFOOWtOZAQ29OxHIgXkTzppAxMTNtFfe76uQV_z8UzaI/exec';
 
-  console.log('Google Sheets Webhook URL:', GOOGLE_APPS_SCRIPT_URL);
+  console.log('[GoogleSheets] Webhook URL:', GOOGLE_APPS_SCRIPT_URL);
 
   if (!GOOGLE_APPS_SCRIPT_URL) {
-    console.warn('Google Apps Script URL not configured');
+    console.warn('[GoogleSheets] URL not configured');
     return { success: false, error: 'Not configured' };
   }
 
-  console.log('Sending data to Google Sheets:', data);
+  const payloadSize = JSON.stringify(data).length;
+  console.log('[GoogleSheets] Sending data:', data);
+  console.log('[GoogleSheets] Payload size:', payloadSize, 'bytes');
 
   try {
     const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
@@ -16,14 +18,22 @@ export const sendToGoogleSheets = async (data) => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data),
-      mode: 'no-cors'
+      body: JSON.stringify(data)
     });
 
-    console.log('Google Sheets response received (no-cors mode - status unknown)');
-    return { success: true };
+    console.log('[GoogleSheets] Response status:', response.status);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('[GoogleSheets] Error response:', errorText);
+      return { success: false, error: `HTTP ${response.status}: ${errorText}` };
+    }
+
+    const result = await response.json();
+    console.log('[GoogleSheets] Success response:', result);
+    return { success: true, data: result };
   } catch (error) {
-    console.error('Failed to send to Google Sheets:', error);
+    console.error('[GoogleSheets] Request failed:', error);
     return { success: false, error: error.message };
   }
 };
