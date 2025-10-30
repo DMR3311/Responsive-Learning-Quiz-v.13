@@ -1,5 +1,5 @@
 export const sendToGoogleSheets = async (data) => {
-  const GOOGLE_APPS_SCRIPT_URL = import.meta.env.VITE_GOOGLE_APPS_SCRIPT_URL || '';
+  const GOOGLE_APPS_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SHEETS_WEBHOOK_URL || '';
 
   if (!GOOGLE_APPS_SCRIPT_URL) {
     console.warn('Google Apps Script URL not configured');
