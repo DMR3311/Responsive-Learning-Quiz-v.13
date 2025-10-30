@@ -122,8 +122,8 @@ function validatePayload_(payload) {
   }
 
   const results = payload.results_json;
-  if (!results.score || typeof results.score !== 'number') {
-    return { valid: false, error: 'results_json must include numeric score' };
+  if (!results.score || typeof results.score !== 'string') {
+    return { valid: false, error: 'results_json must include score string' };
   }
 
   if (!results.version || typeof results.version !== 'string') {
@@ -198,10 +198,8 @@ function prepareRowData_(payload) {
   const name = stripHtml_(payload.name.trim());
   const email = payload.email.toLowerCase().trim();
   const resultsJson = JSON.stringify(payload.results_json);
-  const testScore = payload.results_json.score || 0;
+  const testScore = payload.results_json.score || '0/0';
   const testVersion = payload.results_json.version || 'unknown';
-  const sourceUrl = payload.source_url || '';
-  const userAgent = payload.user_agent || '';
 
   return [
     timestamp,
@@ -209,9 +207,7 @@ function prepareRowData_(payload) {
     email,
     resultsJson,
     testScore,
-    testVersion,
-    sourceUrl,
-    userAgent
+    testVersion
   ];
 }
 
@@ -228,9 +224,7 @@ function appendToSheet_(rowData) {
         'email',
         'results_json',
         'test_score',
-        'test_version',
-        'source_url',
-        'user_agent'
+        'test_version'
       ];
       sheet.appendRow(headers);
       sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
@@ -273,14 +267,13 @@ function notifyKitApi_(payload) {
     tags.push(`test:${payload.results_json.version}`);
   }
   if (payload.results_json.score) {
-    const bucket = getScoreBucket_(payload.results_json.score);
-    tags.push(`score:${bucket}`);
-  }
-  if (payload.source_url) {
-    try {
-      const host = new URL(payload.source_url).hostname;
-      tags.push(`source:${host}`);
-    } catch (e) {}
+    // Extract numeric score from "X/Y" format
+    const scoreMatch = payload.results_json.score.match(/^(\d+)\/(\d+)$/);
+    if (scoreMatch) {
+      const score = parseInt(scoreMatch[1]);
+      const bucket = getScoreBucket_(score);
+      tags.push(`score:${bucket}`);
+    }
   }
 
   const requestPayload = {
@@ -322,7 +315,6 @@ function notifyKitWebhook_(payload) {
     quiz_score: payload.results_json.score,
     quiz_version: payload.results_json.version,
     quiz_results: payload.results_json,
-    source_url: payload.source_url,
     timestamp: new Date().toISOString()
   };
 
@@ -401,16 +393,15 @@ function testSubmission() {
         email: "test@example.com",
         results_json: {
           version: "v1.0",
-          score: 85,
-          domains: [
-            { id: "logic", pct: 90 },
-            { id: "creativity", pct: 80 }
-          ],
-          raw: [1, 0, 1, 1, 0, 1],
-          duration_sec: 300
-        },
-        source_url: "https://braintrain.org/quiz",
-        user_agent: "Mozilla/5.0"
+          score: "24/30",
+          html_report: "<html>...</html>",
+          summary: {
+            accuracy: 80,
+            mode: "practice",
+            total_questions: 10
+          },
+          detailed_history: []
+        }
       }),
       length: 500
     },

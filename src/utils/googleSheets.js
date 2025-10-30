@@ -32,6 +32,19 @@ export const formatQuizDataForSheets = (user, mode, history, finalScore, questio
   const developingAnswers = history.filter(h => h.answerClass === 'developing').length;
   const overallAccuracy = totalQuestions > 0 ? Math.round((masteryAnswers / totalQuestions) * 100) : 0;
 
+  // Calculate maximum possible score (mastery answers get highest score_delta)
+  const maxPossibleScore = history.reduce((sum, item) => {
+    // For difficulty 3 questions, mastery gets +5 bonus
+    const bonus = item.difficulty === 3 && item.answerClass === 'mastery' ? 5 : 0;
+    // Maximum base score_delta for mastery is typically 3, but we use the actual mastery score
+    return sum + (item.answerClass === 'mastery' ? item.scoreDelta :
+                  item.difficulty === 3 ? 8 : // 3 base + 5 bonus for level 3
+                  item.difficulty === 2 ? 2 :
+                  1); // difficulty 1
+  }, 0);
+
+  const scoreDisplay = `${finalScore}/${maxPossibleScore}`;
+
   const avgTime = questionTimes.length > 0
     ? Math.round(questionTimes.reduce((a, b) => a + b, 0) / questionTimes.length)
     : 0;
@@ -290,7 +303,7 @@ export const formatQuizDataForSheets = (user, mode, history, finalScore, questio
     email: userEmail,
     results_json: {
       version: 'v1.0',
-      score: finalScore,
+      score: scoreDisplay,
       html_report: htmlReport,
       summary: {
         accuracy: overallAccuracy,
@@ -312,7 +325,6 @@ export const formatQuizDataForSheets = (user, mode, history, finalScore, questio
         }))
       },
       detailed_history: history
-    },
-    source_url: window.location.href
+    }
   };
 };
