@@ -51,7 +51,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [gameState]);
 
   useEffect(() => {
@@ -132,7 +132,7 @@ function App() {
       setQuestionNumber(prev => prev + 1);
       setQuestionStartTime(Date.now());
       setLastActivityTime(Date.now());
-      window.scrollTo(0, 0);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       completeQuiz(engineInstance);
     }
