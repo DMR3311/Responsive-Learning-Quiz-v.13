@@ -10,7 +10,7 @@ export function WelcomeIntro({ onStart, userName }) {
       <ParticleBackground />
       <div className="welcome-card">
         <div className="welcome-header">
-          <h1>Unlock Your Cognitive Potential</h1>
+          <h1>Let's Find Your Learning Super Powers!</h1>
           <p className="welcome-subtitle">
             Hi {userName}! Discover your strengths and level up your thinking.
           </p>
@@ -74,7 +74,7 @@ export function WelcomeIntro({ onStart, userName }) {
             onClick={() => onStart(difficulty)}
             disabled={!difficulty}
           >
-            Start Assessment
+            Start the Quiz
           </button>
         </div>
       </div>
