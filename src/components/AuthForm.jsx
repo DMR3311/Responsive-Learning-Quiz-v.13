@@ -110,7 +110,7 @@ export function AuthForm({ onAuthSuccess }) {
             className="btn btn-primary btn-full auth-start-button"
             disabled={loading}
           >
-            {loading ? 'Loading...' : 'Begin Your Journey'}
+            {loading ? 'Loading...' : 'Start the Quiz'}
           </button>
         </form>
 
