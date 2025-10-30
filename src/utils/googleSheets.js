@@ -1,8 +1,8 @@
 export const sendToGoogleSheets = async (data) => {
-  const GOOGLE_FORM_URL = import.meta.env.VITE_GOOGLE_FORM_URL || '';
+  const GOOGLE_APPS_SCRIPT_URL = import.meta.env.VITE_GOOGLE_APPS_SCRIPT_URL || '';
 
-  if (!GOOGLE_FORM_URL) {
-    console.warn('Google Form URL not configured');
+  if (!GOOGLE_APPS_SCRIPT_URL) {
+    console.warn('Google Apps Script URL not configured');
     return { success: false, error: 'Not configured' };
   }
 
@@ -13,7 +13,7 @@ export const sendToGoogleSheets = async (data) => {
       formData.append(key, typeof value === 'object' ? JSON.stringify(value) : value);
     });
 
-    await fetch(GOOGLE_FORM_URL, {
+    await fetch(GOOGLE_APPS_SCRIPT_URL, {
       method: 'POST',
       body: formData,
       mode: 'no-cors'
