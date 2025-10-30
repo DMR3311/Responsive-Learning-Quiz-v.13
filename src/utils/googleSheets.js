@@ -90,10 +90,10 @@ Total Duration: ${Math.round((questionTimes.reduce((a, b) => a + b, 0)) / 1000)}
     name: userName,
     email: userEmail,
     results_json: {
+      version: 'v1.0',
+      score: finalScore,
       report: readableReport,
       summary: {
-        version: 'v1.0',
-        score: finalScore,
         accuracy: overallAccuracy,
         performance_level: performanceLevel,
         mode: mode,
