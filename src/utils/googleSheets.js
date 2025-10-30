@@ -24,7 +24,7 @@ export const sendToGoogleSheets = async (data) => {
 };
 
 export const formatQuizDataForSheets = (user, mode, history, finalScore, questionTimes) => {
-  const userName = user?.isGuest ? 'Guest' : (user?.email || 'Unknown');
+  const userName = user?.isGuest ? 'Guest' : (user?.name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'Unknown');
   const userEmail = user?.email || 'guest@example.com';
   const totalQuestions = history.length;
   const optimalAnswers = history.filter(h => h.answerClass === 'mastery').length;
