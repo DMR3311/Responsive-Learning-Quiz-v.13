@@ -27,40 +27,93 @@ export const formatQuizDataForSheets = (user, mode, history, finalScore, questio
   const userName = user?.isGuest ? 'Guest' : (user?.name || user?.user_metadata?.name || user?.email?.split('@')[0] || 'Unknown');
   const userEmail = user?.email || 'guest@example.com';
   const totalQuestions = history.length;
-  const optimalAnswers = history.filter(h => h.answerClass === 'mastery').length;
+  const masteryAnswers = history.filter(h => h.answerClass === 'mastery').length;
+  const proficientAnswers = history.filter(h => h.answerClass === 'proficient').length;
+  const developingAnswers = history.filter(h => h.answerClass === 'developing').length;
+  const overallAccuracy = totalQuestions > 0 ? Math.round((masteryAnswers / totalQuestions) * 100) : 0;
+
   const avgTime = questionTimes.length > 0
     ? Math.round(questionTimes.reduce((a, b) => a + b, 0) / questionTimes.length)
     : 0;
 
   const domainBreakdown = history.reduce((acc, h) => {
     if (!acc[h.domain]) {
-      acc[h.domain] = { total: 0, optimal: 0 };
+      acc[h.domain] = { mastery: 0, proficient: 0, developing: 0, total: 0, scoreDelta: 0 };
     }
     acc[h.domain].total++;
-    if (h.answerClass === 'mastery') {
-      acc[h.domain].optimal++;
-    }
+    acc[h.domain][h.answerClass]++;
+    acc[h.domain].scoreDelta += h.scoreDelta;
     return acc;
   }, {});
 
-  const domainStats = Object.entries(domainBreakdown).map(([domain, stats]) => ({
-    id: domain,
-    pct: Math.round((stats.optimal / stats.total) * 100)
-  }));
+  const domainReport = Object.entries(domainBreakdown).map(([domain, stats]) => {
+    const accuracy = Math.round((stats.mastery / stats.total) * 100);
+    return `${domain.toUpperCase()}: ${accuracy}% mastery (${stats.mastery}/${stats.total} optimal, Score: ${stats.scoreDelta})`;
+  }).join('\n');
+
+  const performanceLevel = overallAccuracy >= 80 ? 'Excellent' :
+                          overallAccuracy >= 60 ? 'Good' :
+                          overallAccuracy >= 40 ? 'Average' : 'Developing';
+
+  const readableReport = `
+QUIZ RESULTS REPORT
+==================
+Name: ${userName}
+Email: ${userEmail}
+Mode: ${mode}
+Date: ${new Date().toLocaleString()}
+
+OVERALL PERFORMANCE
+-------------------
+Final Score: ${finalScore} points
+Accuracy: ${overallAccuracy}%
+Performance Level: ${performanceLevel}
+Questions Answered: ${totalQuestions}
+
+ANSWER BREAKDOWN
+----------------
+✓ Mastery: ${masteryAnswers} questions (${Math.round((masteryAnswers/totalQuestions)*100)}%)
+○ Proficient: ${proficientAnswers} questions (${Math.round((proficientAnswers/totalQuestions)*100)}%)
+△ Developing: ${developingAnswers} questions (${Math.round((developingAnswers/totalQuestions)*100)}%)
+
+DOMAIN PERFORMANCE
+------------------
+${domainReport}
+
+TIMING
+------
+Average Time per Question: ${avgTime}ms
+Total Duration: ${Math.round((questionTimes.reduce((a, b) => a + b, 0)) / 1000)}s
+`;
 
   return {
     name: userName,
     email: userEmail,
     results_json: {
-      version: 'v1.0',
-      score: finalScore,
-      mode: mode,
-      total_questions: totalQuestions,
-      optimal_answers: optimalAnswers,
-      avg_time: avgTime,
-      domains: domainStats,
-      raw: history,
-      duration_sec: Math.round((questionTimes.reduce((a, b) => a + b, 0)) / 1000)
+      report: readableReport,
+      summary: {
+        version: 'v1.0',
+        score: finalScore,
+        accuracy: overallAccuracy,
+        performance_level: performanceLevel,
+        mode: mode,
+        total_questions: totalQuestions,
+        mastery_answers: masteryAnswers,
+        proficient_answers: proficientAnswers,
+        developing_answers: developingAnswers,
+        avg_time_ms: avgTime,
+        duration_sec: Math.round((questionTimes.reduce((a, b) => a + b, 0)) / 1000),
+        domains: Object.entries(domainBreakdown).map(([domain, stats]) => ({
+          domain,
+          accuracy: Math.round((stats.mastery / stats.total) * 100),
+          mastery: stats.mastery,
+          proficient: stats.proficient,
+          developing: stats.developing,
+          total: stats.total,
+          score_delta: stats.scoreDelta
+        }))
+      },
+      detailed_history: history
     },
     source_url: window.location.href,
     user_agent: navigator.userAgent
