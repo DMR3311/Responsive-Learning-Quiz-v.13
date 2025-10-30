@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { captureInitialLead } from '../utils/leadCapture';
 
 export function AuthForm({ onAuthSuccess }) {
   const [name, setName] = useState('');
@@ -52,6 +53,11 @@ export function AuthForm({ onAuthSuccess }) {
         };
 
         localStorage.setItem('blueprint_user', JSON.stringify(userData));
+
+        captureInitialLead(name, email).catch(err => {
+          console.error('Lead capture error:', err);
+        });
+
         onAuthSuccess(false, true);
       }
     } catch (err) {
