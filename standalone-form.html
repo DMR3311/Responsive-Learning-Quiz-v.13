@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Braintrain Quiz Results Submission</title>
-  <!-- Allow posting only to Apps Script -->
   <meta http-equiv="Content-Security-Policy"
         content="default-src 'self';
                  script-src 'self' 'unsafe-inline';
@@ -83,8 +82,7 @@
   </div>
 
   <script>
-    // TODO: replace with your deployed Apps Script Web App URL ending in /exec
-    const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/REPLACE_ME/exec';
+    const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwN3B4td-NV2PEC0bn_ARjXFOOWtOZAQ29OxHIgXkTzppAxMTNtFfe76uQV_z8UzaI/exec';
 
     const form = document.getElementById('resultsForm');
     const messageEl = document.getElementById('message');
@@ -98,7 +96,7 @@
     }
 
     function validateEmail(email) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);
     }
 
     function parseAndValidateResults(jsonText) {
@@ -139,14 +137,10 @@
       const v = parseAndValidateResults(resultsText);
       if (!v.ok) return showMessage(v.err, 'error');
 
-      if (!GOOGLE_APPS_SCRIPT_URL || GOOGLE_APPS_SCRIPT_URL.includes('REPLACE_ME')) {
-        return showMessage('Configure GOOGLE_APPS_SCRIPT_URL first.', 'error');
-      }
-
       submitBtn.disabled = true;
       submitBtn.textContent = 'Submitting…';
 
-      // Send as form-encoded to avoid CORS preflight on Apps Script
+      // Form-encoded to avoid CORS preflight
       const params = new URLSearchParams({
         name,
         email,
@@ -162,7 +156,6 @@
           body: params.toString()
         });
 
-        // Apps Script ContentService always returns 200; rely on JSON "ok"
         const json = await res.json().catch(() => ({}));
 
         if (json && json.ok) {
@@ -182,3 +175,4 @@
   </script>
 </body>
 </html>
+
