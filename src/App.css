@@ -4,6 +4,17 @@
   box-sizing: border-box;
 }
 
+*::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 html {
   scroll-behavior: auto;
   overflow-y: scroll;
@@ -12,7 +23,9 @@ html {
 }
 
 html::-webkit-scrollbar {
-  display: none;
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -29,15 +42,14 @@ body {
   min-height: 100vh;
   padding: 20px;
   overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 body::-webkit-scrollbar {
-  display: none;
-}
-
-body {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
 }
 
 .quiz-container {
