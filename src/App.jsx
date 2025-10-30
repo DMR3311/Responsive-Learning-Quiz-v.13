@@ -48,6 +48,20 @@ function App() {
         console.error('Failed to parse saved user');
       }
     }
+
+    const adminSession = localStorage.getItem('admin_session');
+    if (adminSession) {
+      try {
+        const session = JSON.parse(adminSession);
+        const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD || 'Results@2025';
+        setIsAdmin(true);
+        setAdminPassword(adminPassword);
+        setShowAdmin(true);
+      } catch (e) {
+        console.error('Failed to parse admin session');
+      }
+    }
+
     setAuthChecked(true);
   }, []);
 
@@ -262,7 +276,7 @@ function App() {
     if (!isAdmin) {
       return <AdminLogin onLogin={(password) => { setIsAdmin(true); setAdminPassword(password); }} />;
     }
-    return <AdminDashboard adminPassword={adminPassword} onLogout={() => { setIsAdmin(false); setShowAdmin(false); setAdminPassword(null); }} />;
+    return <AdminDashboard adminPassword={adminPassword} onLogout={() => { setIsAdmin(false); setShowAdmin(false); setAdminPassword(null); localStorage.removeItem('admin_session'); }} />;
   }
 
   if (!user) {
