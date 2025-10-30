@@ -8,11 +8,11 @@
 // CONFIGURATION - UPDATE THESE VALUES
 // ============================================================================
 const CONFIG = {
-  SPREADSHEET_ID: 'YOUR_SPREADSHEET_ID_HERE',
+  SPREADSHEET_ID: '1Dtp2HWlVhtPHxfH2aESoN2xT-gMo4jSrJzuvmpSUbDk',
   SHEET_NAME: 'Submissions',
   DEDUP_WINDOW_MIN: 5,
 
-  KIT_MODE: 'webhook',
+  KIT_MODE: 'off',
   KIT_API_BASE: 'https://api.convertkit.com/v3',
   KIT_API_KEY: 'YOUR_KIT_API_KEY_HERE',
   KIT_FORM_ID: 'YOUR_KIT_FORM_ID_HERE',
