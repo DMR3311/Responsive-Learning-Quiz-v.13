@@ -1,185 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Braintrain Quiz Results Submission</title>
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://script.google.com;">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self';
+                 script-src 'self' 'unsafe-inline';
+                 style-src 'self' 'unsafe-inline';
+                 connect-src 'self' https://script.google.com;">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .container {
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      max-width: 500px;
-      width: 100%;
-      padding: 40px;
-    }
-
-    h1 {
-      color: #333;
-      margin-bottom: 10px;
-      font-size: 28px;
-    }
-
-    .subtitle {
-      color: #666;
-      margin-bottom: 30px;
-      font-size: 14px;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      color: #333;
-      font-weight: 500;
-      margin-bottom: 8px;
-      font-size: 14px;
-    }
-
-    input[type="text"],
-    input[type="email"],
-    textarea {
-      width: 100%;
-      padding: 12px 16px;
-      border: 2px solid #e0e0e0;
-      border-radius: 8px;
-      font-size: 16px;
-      transition: border-color 0.3s;
-      font-family: inherit;
-    }
-
-    input:focus,
-    textarea:focus {
-      outline: none;
-      border-color: #667eea;
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 100px;
-      font-family: 'Courier New', monospace;
-      font-size: 12px;
-    }
-
-    .btn {
-      width: 100%;
-      padding: 14px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .btn:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-    }
-
-    .btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .message {
-      padding: 12px 16px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      font-size: 14px;
-      display: none;
-    }
-
-    .message.show {
-      display: block;
-    }
-
-    .message.error {
-      background: #fee;
-      color: #c33;
-      border: 1px solid #fcc;
-    }
-
-    .message.success {
-      background: #efe;
-      color: #3c3;
-      border: 1px solid #cfc;
-    }
-
-    .example {
-      background: #f5f5f5;
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      padding: 12px;
-      margin-top: 8px;
-      font-size: 12px;
-    }
-
-    .example-title {
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: #666;
-    }
-
-    .example pre {
-      background: white;
-      padding: 8px;
-      border-radius: 4px;
-      overflow-x: auto;
-      font-family: 'Courier New', monospace;
-      font-size: 11px;
-      color: #333;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    .note {
-      background: #fff9e6;
-      border-left: 4px solid #ffc107;
-      padding: 12px;
-      margin: 20px 0;
-      font-size: 13px;
-      color: #666;
-    }
-
-    .fill-example-btn {
-      background: #f0f0f0;
-      color: #333;
-      border: 1px solid #ddd;
-      padding: 8px 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-      margin-top: 10px;
-      transition: background 0.2s;
-    }
-
-    .fill-example-btn:hover {
-      background: #e0e0e0;
-    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+    .container{background:#fff;border-radius:16px;box-shadow:0 20px 60px rgba(0,0,0,.3);max-width:500px;width:100%;padding:40px}
+    h1{color:#333;margin-bottom:10px;font-size:28px}
+    .subtitle{color:#666;margin-bottom:30px;font-size:14px}
+    .form-group{margin-bottom:20px}
+    label{display:block;color:#333;font-weight:500;margin-bottom:8px;font-size:14px}
+    input[type="text"],input[type="email"],textarea{width:100%;padding:12px 16px;border:2px solid #e0e0e0;border-radius:8px;font-size:16px;transition:border-color .3s;font-family:inherit}
+    input:focus,textarea:focus{outline:none;border-color:#667eea}
+    textarea{resize:vertical;min-height:100px;font-family:'Courier New',monospace;font-size:12px}
+    .btn{width:100%;padding:14px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;transition:transform .2s,box-shadow .2s}
+    .btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 20px rgba(102,126,234,.4)}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    .message{padding:12px 16px;border-radius:8px;margin-bottom:20px;font-size:14px;display:none}
+    .message.show{display:block}
+    .message.error{background:#fee;color:#c33;border:1px solid #fcc}
+    .message.success{background:#efe;color:#3c3;border:1px solid #cfc}
+    .example{background:#f5f5f5;border:1px solid #e0e0e0;border-radius:8px;padding:12px;margin-top:8px;font-size:12px}
+    .example-title{font-weight:600;margin-bottom:8px;color:#666}
+    .example pre{background:#fff;padding:8px;border-radius:4px;overflow-x:auto;font-family:'Courier New',monospace;font-size:11px;color:#333}
+    .fill-example-btn{background:#f0f0f0;color:#333;border:1px solid #ddd;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:14px;margin-top:10px;transition:background .2s}
+    .fill-example-btn:hover{background:#e0e0e0}
   </style>
 </head>
 <body>
@@ -192,25 +44,23 @@
     <form id="resultsForm">
       <div class="form-group">
         <label for="name">Name *</label>
-        <input type="text" id="name" name="name" required minlength="1" maxlength="100" placeholder="Your full name">
+        <input type="text" id="name" name="name" required minlength="1" maxlength="100" placeholder="Your full name" />
       </div>
 
       <div class="form-group">
         <label for="email">Email *</label>
-        <input type="email" id="email" name="email" required placeholder="your.email@example.com">
+        <input type="email" id="email" name="email" required placeholder="your.email@example.com" />
       </div>
 
       <div class="form-group">
         <label for="results_json">Test Results (JSON) *</label>
-        <textarea id="results_json" name="results_json" required placeholder='{"version":"v1.0","score":85,...}'></textarea>
+        <textarea id="results_json" name="results_json" required placeholder='{"version":"v1.0","score":87,...}'></textarea>
 
-        <button type="button" class="fill-example-btn" onclick="fillExampleData()">
-          📝 Fill Example Data
-        </button>
+        <button type="button" class="fill-example-btn" id="fillBtn">📝 Fill Example Data</button>
 
         <div class="example">
           <div class="example-title">Example JSON format:</div>
-          <pre>{
+<pre>{
   "version": "v1.0",
   "score": 87,
   "domains": [
@@ -223,144 +73,105 @@
         </div>
       </div>
 
-      <div class="note">
-        <strong>Note:</strong> All fields are required. The results_json field must be valid JSON and include both "score" (number) and "version" (string) properties.
+      <div class="note" style="background:#fff9e6;border-left:4px solid #ffc107;padding:12px;margin:20px 0;font-size:13px;color:#666">
+        <strong>Note:</strong> All fields are required. <code>results_json</code> must include <code>score</code> (number) and <code>version</code> (string).
       </div>
 
-      <button type="submit" class="btn" id="submitBtn">
-        Submit Results
-      </button>
+      <button type="submit" class="btn" id="submitBtn">Submit Results</button>
     </form>
   </div>
 
   <script>
-    const GOOGLE_APPS_SCRIPT_URL = 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE';
+    const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwN3B4td-NV2PEC0bn_ARjXFOOWtOZAQ29OxHIgXkTzppAxMTNtFfe76uQV_z8UzaI/exec';
 
     const form = document.getElementById('resultsForm');
     const messageEl = document.getElementById('message');
     const submitBtn = document.getElementById('submitBtn');
+    const fillBtn = document.getElementById('fillBtn');
 
     function showMessage(text, type) {
       messageEl.textContent = text;
-      messageEl.className = `message ${type} show`;
-      setTimeout(() => {
-        messageEl.classList.remove('show');
-      }, 5000);
+      messageEl.className = 'message ' + type + ' show';
+      setTimeout(() => messageEl.classList.remove('show'), 5000);
     }
 
     function validateEmail(email) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      return emailRegex.test(email);
+      return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);
     }
 
-    function validateJSON(jsonString) {
+    function parseAndValidateResults(jsonText) {
       try {
-        const parsed = JSON.parse(jsonString);
-        if (typeof parsed !== 'object' || parsed === null) {
-          return { valid: false, error: 'Results must be a JSON object' };
-        }
-        if (typeof parsed.score !== 'number') {
-          return { valid: false, error: 'JSON must include a numeric "score" property' };
-        }
-        if (typeof parsed.version !== 'string') {
-          return { valid: false, error: 'JSON must include a string "version" property' };
-        }
-        return { valid: true, data: parsed };
-      } catch (err) {
-        return { valid: false, error: 'Invalid JSON format: ' + err.message };
+        const data = JSON.parse(jsonText);
+        if (typeof data !== 'object' || data === null) return { ok: false, err: 'Results must be a JSON object' };
+        if (typeof data.score !== 'number') return { ok: false, err: 'JSON must include a numeric "score"' };
+        if (typeof data.version !== 'string') return { ok: false, err: 'JSON must include a string "version"' };
+        return { ok: true, data };
+      } catch (e) {
+        return { ok: false, err: 'Invalid JSON: ' + e.message };
       }
     }
 
-    function fillExampleData() {
+    fillBtn.addEventListener('click', () => {
       document.getElementById('name').value = 'Ava Example';
       document.getElementById('email').value = 'ava@example.com';
       document.getElementById('results_json').value = JSON.stringify({
-        "version": "v1.2",
-        "score": 87,
-        "domains": [
-          {"id":"logic","pct":92},
-          {"id":"creativity","pct":83}
-        ],
-        "raw": [1,0,1,1,0,1],
-        "duration_sec": 312
+        version: 'v1.2',
+        score: 87,
+        domains: [{id:'logic', pct:92}, {id:'creativity', pct:83}],
+        raw: [1,0,1,1,0,1],
+        duration_sec: 312
       }, null, 2);
-      showMessage('Example data filled in! You can now submit the form.', 'success');
-    }
+      showMessage('Example data filled. Submit when ready.', 'success');
+    });
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       const name = document.getElementById('name').value.trim();
       const email = document.getElementById('email').value.trim();
-      const resultsJsonText = document.getElementById('results_json').value.trim();
+      const resultsText = document.getElementById('results_json').value.trim();
 
-      if (!name || name.length < 1 || name.length > 100) {
-        showMessage('Name must be between 1 and 100 characters', 'error');
-        return;
-      }
+      if (!name || name.length > 100) return showMessage('Name must be 1–100 characters', 'error');
+      if (!validateEmail(email)) return showMessage('Enter a valid email', 'error');
 
-      if (!validateEmail(email)) {
-        showMessage('Please enter a valid email address', 'error');
-        return;
-      }
-
-      const jsonValidation = validateJSON(resultsJsonText);
-      if (!jsonValidation.valid) {
-        showMessage(jsonValidation.error, 'error');
-        return;
-      }
-
-      if (!GOOGLE_APPS_SCRIPT_URL || GOOGLE_APPS_SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE') {
-        showMessage('Google Apps Script URL not configured. Please update the script.', 'error');
-        return;
-      }
+      const v = parseAndValidateResults(resultsText);
+      if (!v.ok) return showMessage(v.err, 'error');
 
       submitBtn.disabled = true;
-      submitBtn.textContent = 'Submitting...';
+      submitBtn.textContent = 'Submitting…';
 
-      const payload = {
-        name: name,
-        email: email,
-        results_json: jsonValidation.data,
+      // Form-encoded to avoid CORS preflight
+      const params = new URLSearchParams({
+        name,
+        email,
+        results_json: JSON.stringify(v.data),
         source_url: window.location.href,
         user_agent: navigator.userAgent
-      };
+      });
 
       try {
-        const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+        const res = await fetch(GOOGLE_APPS_SCRIPT_URL, {
           method: 'POST',
-          mode: 'cors',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload)
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+          body: params.toString()
         });
 
-        const result = await response.json();
+        const json = await res.json().catch(() => ({}));
 
-        if (response.ok && result.ok) {
-          showMessage(
-            result.dedup
-              ? '✓ Duplicate submission detected (already recorded)'
-              : '✓ Results submitted successfully!',
-            'success'
-          );
-          if (!result.dedup) {
-            form.reset();
-          }
+        if (json && json.ok) {
+          showMessage(json.dedup ? '✓ Duplicate (already recorded)' : '✓ Submitted successfully!', 'success');
+          if (!json.dedup) form.reset();
         } else {
-          showMessage('Error: ' + (result.error || 'Submission failed'), 'error');
+          showMessage('Error: ' + (json.error || 'Submission failed'), 'error');
         }
-      } catch (error) {
-        showMessage('Network error: ' + error.message, 'error');
-        console.error('Submission error:', error);
+      } catch (err) {
+        showMessage('Network error: ' + err.message, 'error');
+        console.error(err);
       } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = 'Submit Results';
       }
     });
-
-    window.fillExampleData = fillExampleData;
   </script>
 </body>
 </html>
