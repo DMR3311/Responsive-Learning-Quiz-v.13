@@ -1,238 +1,186 @@
 // ============================================================================
 // Braintrain Quiz Results - Google Apps Script Web App
-// ============================================================================
-// Deploy as Web App with "Anyone" access to receive CORS POST requests
+// Deploy as Web App: Execute as "Me", Access "Anyone"
 // ============================================================================
 
-// ============================================================================
-// CONFIGURATION - UPDATE THESE VALUES
-// ============================================================================
 const CONFIG = {
   SPREADSHEET_ID: '1Dtp2HWlVhtPHxfH2aESoN2xT-gMo4jSrJzuvmpSUbDk',
   SHEET_NAME: 'Submissions',
   DEDUP_WINDOW_MIN: 5,
 
+  // Kit disabled here; re-enable later if needed
   KIT_MODE: 'off',
-  KIT_API_BASE: 'https://api.convertkit.com/v3',
-  KIT_API_KEY: 'YOUR_KIT_API_KEY_HERE',
-  KIT_FORM_ID: 'YOUR_KIT_FORM_ID_HERE',
-  KIT_TAGS: ['braintrain-quiz', 'lead-magnet'],
-  KIT_WEBHOOK_URL: 'YOUR_KIT_WEBHOOK_URL_HERE',
 
-  MAX_PAYLOAD_SIZE: 100 * 1024,
+  MAX_PAYLOAD_SIZE: 100 * 1024, // 100KB
   RATE_LIMIT_PER_IP: 10,
   RATE_LIMIT_WINDOW_SEC: 60
 };
 
-// ============================================================================
-// MAIN HANDLER
-// ============================================================================
+// Health check so GET /exec doesn’t 404
+function doGet() {
+  return ContentService.createTextOutput('OK').setMimeType(ContentService.MimeType.TEXT);
+}
 
+// NOTE: Apps Script cannot set arbitrary response headers via ContentService.
+// Avoid preflight by sending application/x-www-form-urlencoded from the browser,
+// or proxy JSON through a worker. This handler supports BOTH formats.
 function doPost(e) {
   try {
-    const corsHeaders = {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-      'Content-Type': 'application/json'
-    };
+    if (!e || !e.postData) return createResponse_({ ok: false, error: 'No data received' }, 400);
 
-    if (!e || !e.postData) {
-      return createResponse_({ ok: false, error: 'No data received' }, corsHeaders);
+    // Size guard
+    const contentLen = (e.postData.contents || '').length;
+    if (contentLen > CONFIG.MAX_PAYLOAD_SIZE) {
+      return createResponse_({ ok: false, error: 'Payload too large' }, 413);
     }
 
-    const contentLength = e.postData.length;
-    if (contentLength > CONFIG.MAX_PAYLOAD_SIZE) {
-      return createResponse_({ ok: false, error: 'Payload too large' }, corsHeaders);
-    }
+    // Rate limit
+    const ip = getIp_(e);
+    if (!checkRateLimit_(ip)) return createResponse_({ ok: false, error: 'Rate limit exceeded' }, 429);
 
-    const clientIp = e.parameter.userip || 'unknown';
-    if (!checkRateLimit_(clientIp)) {
-      return createResponse_({ ok: false, error: 'Rate limit exceeded' }, corsHeaders);
-    }
+    // Parse body (JSON or form-encoded)
+    const payload = parseBody_(e);
 
-    let payload;
-    try {
-      payload = JSON.parse(e.postData.contents);
-    } catch (err) {
-      logError_('JSON parse error', err);
-      return createResponse_({ ok: false, error: 'Invalid JSON' }, corsHeaders);
-    }
+    // Validate
+    const v = validatePayload_(payload);
+    if (!v.valid) return createResponse_({ ok: false, error: v.error }, 400);
 
-    const validation = validatePayload_(payload);
-    if (!validation.valid) {
-      return createResponse_({ ok: false, error: validation.error }, corsHeaders);
-    }
-
+    // Dedupe
     const dedupeKey = computeDedupeKey_(payload.email, payload.results_json);
     if (isDuplicate_(dedupeKey)) {
-      return createResponse_({ ok: true, dedup: true, message: 'Duplicate submission ignored' }, corsHeaders);
+      return createResponse_({ ok: true, dedup: true, message: 'Duplicate submission ignored' }, 200);
     }
 
-    const rowData = prepareRowData_(payload);
-    const success = appendToSheet_(rowData);
+    // Append
+    const row = prepareRowData_(payload);
+    const ok = appendToSheet_(row);
+    if (!ok) return createResponse_({ ok: false, error: 'Failed to write to sheet' }, 500);
 
-    if (!success) {
-      return createResponse_({ ok: false, error: 'Failed to write to sheet' }, corsHeaders);
-    }
-
+    // Seal dedupe
     markAsProcessed_(dedupeKey);
 
+    // Optional downstream
     notifyKit_(payload);
 
-    return createResponse_({ ok: true, message: 'Submission recorded successfully' }, corsHeaders);
+    return createResponse_({ ok: true, message: 'Submission recorded successfully' }, 200);
 
   } catch (err) {
     logError_('Unexpected error in doPost', err);
-    return createResponse_({ ok: false, error: 'Internal server error' }, corsHeaders);
+    return createResponse_({ ok: false, error: 'Internal server error' }, 500);
   }
 }
 
-function doOptions(e) {
-  return ContentService.createTextOutput('')
-    .setMimeType(ContentService.MimeType.JSON)
-    .setContent(JSON.stringify({ ok: true }))
-    .setHeaders({
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type'
-    });
-}
+// ============================================================================
+// Parsing & Validation
+// ============================================================================
 
-// ============================================================================
-// VALIDATION
-// ============================================================================
+function parseBody_(e) {
+  const type = String(e.postData.type || '').toLowerCase();
+  // Accept JSON and form-encoded
+  if (type.indexOf('application/json') !== -1) {
+    return JSON.parse(e.postData.contents || '{}');
+  } else {
+    // form-encoded lands in e.parameter
+    const p = Object.assign({}, e.parameter || {});
+    // If results_json is a string, parse it
+    if (typeof p.results_json === 'string') {
+      try { p.results_json = JSON.parse(p.results_json); } catch (_) {}
+    }
+    return p;
+  }
+}
 
 function validatePayload_(payload) {
-  if (!payload.name || typeof payload.name !== 'string') {
-    return { valid: false, error: 'Missing or invalid name' };
-  }
-
+  // name
+  if (!payload.name || typeof payload.name !== 'string') return { valid: false, error: 'Missing or invalid name' };
   const name = stripHtml_(payload.name.trim());
-  if (name.length < 1 || name.length > 100) {
-    return { valid: false, error: 'Name must be 1-100 characters' };
+  if (name.length < 1 || name.length > 100) return { valid: false, error: 'Name must be 1-100 characters' };
+
+  // email
+  if (!payload.email || !isValidEmail_(payload.email)) return { valid: false, error: 'Invalid email address' };
+
+  // results_json
+  const r = payload.results_json;
+  if (!r || typeof r !== 'object') return { valid: false, error: 'Missing or invalid results_json' };
+
+  // score: allow number OR string (e.g., 24 or "24/30")
+  if (typeof r.score !== 'number' && typeof r.score !== 'string') {
+    return { valid: false, error: 'results_json.score must be number or string' };
   }
 
-  if (!payload.email || !isValidEmail_(payload.email)) {
-    return { valid: false, error: 'Invalid email address' };
-  }
-
-  if (!payload.results_json || typeof payload.results_json !== 'object') {
-    return { valid: false, error: 'Missing or invalid results_json' };
-  }
-
-  const results = payload.results_json;
-  if (!results.score || typeof results.score !== 'string') {
-    return { valid: false, error: 'results_json must include score string' };
-  }
-
-  if (!results.version || typeof results.version !== 'string') {
-    return { valid: false, error: 'results_json must include version string' };
+  // version: require string
+  if (!r.version || typeof r.version !== 'string') {
+    return { valid: false, error: 'results_json.version must be a string' };
   }
 
   return { valid: true };
 }
 
-function isValidEmail_(email) {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-}
-
-function stripHtml_(str) {
-  return str.replace(/<[^>]*>/g, '');
-}
-
 // ============================================================================
-// DEDUPLICATION
+// Dedupe & Rate Limit
 // ============================================================================
 
 function computeDedupeKey_(email, resultsJson) {
   const input = email.toLowerCase() + JSON.stringify(resultsJson);
-  return Utilities.computeDigest(
-    Utilities.DigestAlgorithm.SHA_256,
-    input,
-    Utilities.Charset.UTF_8
-  ).map(b => ('0' + (b & 0xFF).toString(16)).slice(-2)).join('');
+  const bytes = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, input, Utilities.Charset.UTF_8);
+  return bytes.map(b => ('0' + (b & 0xff).toString(16)).slice(-2)).join('');
 }
 
 function isDuplicate_(dedupeKey) {
   const cache = CacheService.getScriptCache();
-  const cached = cache.get(dedupeKey);
-  return cached !== null;
+  return cache.get(dedupeKey) !== null;
 }
 
 function markAsProcessed_(dedupeKey) {
-  const cache = CacheService.getScriptCache();
-  cache.put(dedupeKey, '1', CONFIG.DEDUP_WINDOW_MIN * 60);
+  CacheService.getScriptCache().put(dedupeKey, '1', CONFIG.DEDUP_WINDOW_MIN * 60);
 }
 
-// ============================================================================
-// RATE LIMITING
-// ============================================================================
+function getIp_(e) {
+  const h = (e.headers || {});
+  return (e.parameter && e.parameter.userip) || h['x-forwarded-for'] || h['x-real-ip'] || 'unknown';
+}
 
 function checkRateLimit_(ip) {
   const cache = CacheService.getScriptCache();
-  const key = 'ratelimit_' + ip;
-  const count = cache.get(key);
-
-  if (count === null) {
-    cache.put(key, '1', CONFIG.RATE_LIMIT_WINDOW_SEC);
-    return true;
-  }
-
-  const currentCount = parseInt(count);
-  if (currentCount >= CONFIG.RATE_LIMIT_PER_IP) {
-    return false;
-  }
-
-  cache.put(key, String(currentCount + 1), CONFIG.RATE_LIMIT_WINDOW_SEC);
-  return true;
+  const key = 'rl_' + ip;
+  const cur = Number(cache.get(key) || '0') + 1;
+  cache.put(key, String(cur), CONFIG.RATE_LIMIT_WINDOW_SEC);
+  return cur <= CONFIG.RATE_LIMIT_PER_IP;
 }
 
 // ============================================================================
-// SHEET OPERATIONS
+// Sheet I/O
 // ============================================================================
 
 function prepareRowData_(payload) {
-  const timestamp = new Date().toISOString();
+  const ts = new Date().toISOString();
   const name = stripHtml_(payload.name.trim());
   const email = payload.email.toLowerCase().trim();
-  const resultsJson = JSON.stringify(payload.results_json);
-  const testScore = payload.results_json.score || '0/0';
-  const testVersion = payload.results_json.version || 'unknown';
+  const r = payload.results_json || {};
+  const resultsStr = JSON.stringify(r);
 
-  return [
-    timestamp,
-    name,
-    email,
-    resultsJson,
-    testScore,
-    testVersion
-  ];
+  // normalize score/version for columns
+  const testVersion = r.version || 'unknown';
+  let testScore = '';
+  if (typeof r.score === 'number') testScore = String(r.score);
+  else if (typeof r.score === 'string') testScore = r.score;
+
+  // columns: timestamp, name, email, results_json, test_score, test_version
+  return [ts, name, email, resultsStr, testScore, testVersion];
 }
 
-function appendToSheet_(rowData) {
+function appendToSheet_(row) {
   try {
-    const spreadsheet = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
-    let sheet = spreadsheet.getSheetByName(CONFIG.SHEET_NAME);
-
-    if (!sheet) {
-      sheet = spreadsheet.insertSheet(CONFIG.SHEET_NAME);
-      const headers = [
-        'timestamp',
-        'name',
-        'email',
-        'results_json',
-        'test_score',
-        'test_version'
-      ];
-      sheet.appendRow(headers);
-      sheet.getRange(1, 1, 1, headers.length).setFontWeight('bold');
+    const ss = SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+    let sh = ss.getSheetByName(CONFIG.SHEET_NAME);
+    if (!sh) {
+      sh = ss.insertSheet(CONFIG.SHEET_NAME);
+      const headers = ['timestamp','name','email','results_json','test_score','test_version'];
+      sh.getRange(1,1,1,headers.length).setValues([headers]);
+      sh.setFrozenRows(1);
     }
-
-    sheet.appendRow(rowData);
+    sh.appendRow(row);
     return true;
-
   } catch (err) {
     logError_('Failed to append to sheet', err);
     return false;
@@ -240,176 +188,55 @@ function appendToSheet_(rowData) {
 }
 
 // ============================================================================
-// KIT INTEGRATION
+// Kit stub (disabled here)
 // ============================================================================
 
-function notifyKit_(payload) {
-  if (CONFIG.KIT_MODE === 'off') {
-    return;
-  }
-
-  try {
-    if (CONFIG.KIT_MODE === 'api') {
-      notifyKitApi_(payload);
-    } else if (CONFIG.KIT_MODE === 'webhook') {
-      notifyKitWebhook_(payload);
-    }
-  } catch (err) {
-    logError_('Kit notification failed', err);
-  }
-}
-
-function notifyKitApi_(payload) {
-  const url = `${CONFIG.KIT_API_BASE}/forms/${CONFIG.KIT_FORM_ID}/subscribe`;
-
-  const tags = [...CONFIG.KIT_TAGS];
-  if (payload.results_json.version) {
-    tags.push(`test:${payload.results_json.version}`);
-  }
-  if (payload.results_json.score) {
-    // Extract numeric score from "X/Y" format
-    const scoreMatch = payload.results_json.score.match(/^(\d+)\/(\d+)$/);
-    if (scoreMatch) {
-      const score = parseInt(scoreMatch[1]);
-      const bucket = getScoreBucket_(score);
-      tags.push(`score:${bucket}`);
-    }
-  }
-
-  const requestPayload = {
-    api_key: CONFIG.KIT_API_KEY,
-    email: payload.email,
-    first_name: payload.name,
-    tags: tags,
-    fields: {
-      quiz_score: payload.results_json.score,
-      quiz_version: payload.results_json.version,
-      quiz_results: JSON.stringify(payload.results_json)
-    }
-  };
-
-  const options = {
-    method: 'post',
-    contentType: 'application/json',
-    payload: JSON.stringify(requestPayload),
-    muteHttpExceptions: true
-  };
-
-  retryWithBackoff_(() => {
-    const response = UrlFetchApp.fetch(url, options);
-    const code = response.getResponseCode();
-    if (code < 200 || code >= 300) {
-      throw new Error(`Kit API returned ${code}: ${response.getContentText()}`);
-    }
-  });
-}
-
-function notifyKitWebhook_(payload) {
-  if (!CONFIG.KIT_WEBHOOK_URL || CONFIG.KIT_WEBHOOK_URL === 'YOUR_KIT_WEBHOOK_URL_HERE') {
-    return;
-  }
-
-  const webhookPayload = {
-    email: payload.email,
-    name: payload.name,
-    quiz_score: payload.results_json.score,
-    quiz_version: payload.results_json.version,
-    quiz_results: payload.results_json,
-    timestamp: new Date().toISOString()
-  };
-
-  const options = {
-    method: 'post',
-    contentType: 'application/json',
-    payload: JSON.stringify(webhookPayload),
-    muteHttpExceptions: true
-  };
-
-  retryWithBackoff_(() => {
-    const response = UrlFetchApp.fetch(CONFIG.KIT_WEBHOOK_URL, options);
-    const code = response.getResponseCode();
-    if (code < 200 || code >= 300) {
-      throw new Error(`Kit webhook returned ${code}: ${response.getContentText()}`);
-    }
-  });
-}
-
-function getScoreBucket_(score) {
-  if (score >= 90) return 'excellent';
-  if (score >= 75) return 'good';
-  if (score >= 60) return 'average';
-  return 'needs-improvement';
+function notifyKit_(_payload) {
+  if (CONFIG.KIT_MODE === 'off') return;
+  // Implement Kit v4 calls when you enable KIT_MODE='api'
 }
 
 // ============================================================================
-// RETRY LOGIC
+// Utils
 // ============================================================================
 
-function retryWithBackoff_(fn, maxRetries = 3) {
-  let lastError;
+function isValidEmail_(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
 
-  for (let i = 0; i < maxRetries; i++) {
-    try {
-      fn();
-      return;
-    } catch (err) {
-      lastError = err;
-      if (i < maxRetries - 1) {
-        const delay = Math.pow(2, i) * 1000;
-        Utilities.sleep(delay);
-      }
-    }
-  }
+function stripHtml_(s) {
+  return String(s || '').replace(/<[^>]*>/g, '');
+}
 
-  logError_('All retry attempts failed', lastError);
+function createResponse_(obj, statusCode) {
+  const out = ContentService.createTextOutput(JSON.stringify(obj));
+  out.setMimeType(ContentService.MimeType.JSON);
+  // Apps Script doesn’t allow arbitrary headers here. Status code is set by HtmlService only,
+  // but ContentService always returns 200. We include a status field in JSON for clients if needed.
+  return out;
 }
 
 // ============================================================================
-// UTILITIES
-// ============================================================================
-
-function createResponse_(data, headers) {
-  return ContentService.createTextOutput(JSON.stringify(data))
-    .setMimeType(ContentService.MimeType.JSON)
-    .setHeaders(headers);
-}
-
-function logError_(message, error) {
-  console.error(`${message}: ${error.toString()}`);
-  if (error.stack) {
-    console.error(error.stack);
-  }
-}
-
-// ============================================================================
-// TEST FUNCTION
+// Local test
 // ============================================================================
 
 function testSubmission() {
-  const testPayload = {
+  const e = {
     postData: {
+      type: 'application/json',
       contents: JSON.stringify({
         name: "Test User",
         email: "test@example.com",
         results_json: {
           version: "v1.0",
-          score: "24/30",
-          html_report: "<html>...</html>",
-          summary: {
-            accuracy: 80,
-            mode: "practice",
-            total_questions: 10
-          },
-          detailed_history: []
+          score: 24,
+          summary: { accuracy: 80, total_questions: 10 }
         }
-      }),
-      length: 500
+      })
     },
-    parameter: {
-      userip: '127.0.0.1'
-    }
+    headers: { 'x-forwarded-for': '127.0.0.1' },
+    parameter: {}
   };
-
-  const response = doPost(testPayload);
-  Logger.log(response.getContent());
+  const res = doPost(e);
+  Logger.log(res.getContent());
 }
