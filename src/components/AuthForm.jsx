@@ -74,7 +74,7 @@ export function AuthForm({ onAuthSuccess }) {
           <img src="/braintrain logo.png" alt="Braintrain Labs" className="auth-braintrain-logo" />
         </div>
         <h1>Welcome to Braintrain Labs</h1>
-        <p className="auth-subtitle">Unlock your cognitive potential with our <strong>Responsive Learning Machine</strong></p>
+        <p className="auth-subtitle">Let's Find Your Learning Superpowers!</p>
 
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
