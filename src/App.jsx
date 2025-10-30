@@ -14,7 +14,7 @@ import { getDomainConfig } from './utils/domainConfig';
 import { sendToGoogleSheets, formatQuizDataForSheets } from './utils/googleSheets';
 import { createQuizSession, saveQuizAnswer, completeQuizSession } from './utils/database';
 import { smoothScrollToTop } from './utils/smoothScroll';
-import quizData from '../data/items.json';
+import quizData from '../public/items.json';
 import './App.css';
 
 function App() {
