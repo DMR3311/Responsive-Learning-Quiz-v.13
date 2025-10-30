@@ -1,5 +1,17 @@
+let scrollAnimation = null;
+
 export const smoothScrollToTop = (duration = 600) => {
+  if (scrollAnimation) {
+    cancelAnimationFrame(scrollAnimation);
+    scrollAnimation = null;
+  }
+
   const start = window.pageYOffset || document.documentElement.scrollTop;
+
+  if (start === 0) {
+    return;
+  }
+
   const startTime = 'now' in window.performance ? performance.now() : new Date().getTime();
 
   const easeInOutCubic = (t) => {
@@ -15,9 +27,11 @@ export const smoothScrollToTop = (duration = 600) => {
     window.scrollTo(0, start * (1 - easeProgress));
 
     if (progress < 1) {
-      requestAnimationFrame(scroll);
+      scrollAnimation = requestAnimationFrame(scroll);
+    } else {
+      scrollAnimation = null;
     }
   };
 
-  requestAnimationFrame(scroll);
+  scrollAnimation = requestAnimationFrame(scroll);
 };
