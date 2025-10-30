@@ -168,11 +168,11 @@ export function ResultsDashboard({ history, finalScore, user, onReset, onViewHis
         },
         body: JSON.stringify({
           to: user.email,
-          userName: user.email.split('@')[0],
+          userName: user.name || user.email.split('@')[0],
           finalScore,
           questionsAnswered: history.length,
-          masteryAnswers,
-          mastery: overallAccuracy,
+          optimalAnswers: masteryAnswers,
+          accuracy: overallAccuracy,
           reportUrl: window.location.href
         })
       });
