@@ -1,10 +1,14 @@
 export const sendToGoogleSheets = async (data) => {
   const GOOGLE_APPS_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SHEETS_WEBHOOK_URL || '';
 
+  console.log('Google Sheets Webhook URL:', GOOGLE_APPS_SCRIPT_URL);
+
   if (!GOOGLE_APPS_SCRIPT_URL) {
     console.warn('Google Apps Script URL not configured');
     return { success: false, error: 'Not configured' };
   }
+
+  console.log('Sending data to Google Sheets:', data);
 
   try {
     const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
@@ -16,6 +20,7 @@ export const sendToGoogleSheets = async (data) => {
       mode: 'no-cors'
     });
 
+    console.log('Google Sheets response received (no-cors mode - status unknown)');
     return { success: true };
   } catch (error) {
     console.error('Failed to send to Google Sheets:', error);
