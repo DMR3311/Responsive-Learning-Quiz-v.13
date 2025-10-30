@@ -43,8 +43,6 @@ export function WelcomeIntro({ onStart, userName }) {
 
         <DifficultySelector onSelect={setDifficulty} selectedDifficulty={difficulty} />
 
-        <ProgressPreview />
-
         <div className="welcome-footer">
           <button
             className="btn btn-primary btn-large btn-ready"
@@ -54,6 +52,8 @@ export function WelcomeIntro({ onStart, userName }) {
             Start the Quiz
           </button>
         </div>
+
+        <ProgressPreview />
       </div>
     </div>
   );
