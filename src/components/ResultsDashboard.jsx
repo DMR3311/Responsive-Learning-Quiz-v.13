@@ -404,18 +404,9 @@ export function ResultsDashboard({ history, finalScore, user, onReset, onViewHis
           Download Report
         </button>
         {!user?.isGuest && (
-          <>
-            <button
-              className="btn btn-secondary"
-              onClick={handleEmailResults}
-              disabled={emailSending || emailSent}
-            >
-              {emailSending ? 'Sending...' : emailSent ? 'Email Sent!' : 'Email Results'}
-            </button>
-            <button className="btn btn-secondary" onClick={onViewHistory}>
-              View History
-            </button>
-          </>
+          <button className="btn btn-secondary" onClick={onViewHistory}>
+            View History
+          </button>
         )}
       </div>
     </div>
