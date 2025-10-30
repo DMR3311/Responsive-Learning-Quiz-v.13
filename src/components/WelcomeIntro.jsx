@@ -39,29 +39,6 @@ export function WelcomeIntro({ onStart, userName }) {
             </p>
           </div>
 
-          <div className="intro-section">
-            <div className="intro-graphic">
-              <img src="/braintrain logo.png" alt="Braintrain Labs" className="intro-logo" />
-            </div>
-            <h2>Deep Insights Await</h2>
-            <p>
-              The more you engage, the better your results. Complete the assessment to unlock
-              a comprehensive performance report with actionable insights tailored just for you.
-            </p>
-          </div>
-
-          <div className="intro-section">
-            <div className="intro-graphic">
-              <img src="/braintrain logo.png" alt="Braintrain Labs" className="intro-logo" />
-            </div>
-            <h2>Pro Tips</h2>
-            <ul className="tips-list">
-              <li>Focus deeply on each question</li>
-              <li>Think long-term, not just immediate</li>
-              <li>Trust logic and evidence over gut feelings</li>
-              <li>Quality thinking beats speed every time</li>
-            </ul>
-          </div>
         </div>
 
         <DifficultySelector onSelect={setDifficulty} selectedDifficulty={difficulty} />
