@@ -13,12 +13,18 @@ export const sendToGoogleSheets = async (data) => {
   console.log('[GoogleSheets] Payload size:', payloadSize, 'bytes');
 
   try {
+    // Use form-encoded to avoid CORS preflight (Google Apps Script can't handle OPTIONS)
+    const formData = new URLSearchParams();
+    formData.append('name', data.name);
+    formData.append('email', data.email);
+    formData.append('results_json', JSON.stringify(data.results_json));
+
     const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: JSON.stringify(data)
+      body: formData.toString()
     });
 
     console.log('[GoogleSheets] Response status:', response.status);

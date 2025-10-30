@@ -19,7 +19,20 @@ function doPost(e) {
       return respond({ ok: false, error: 'No data received' });
     }
 
-    const payload = JSON.parse(e.postData.contents || '{}');
+    // Handle both JSON and form-encoded requests
+    let payload;
+    const contentType = String(e.postData.type || '').toLowerCase();
+
+    if (contentType.indexOf('application/json') !== -1) {
+      payload = JSON.parse(e.postData.contents || '{}');
+    } else {
+      // Form-encoded data is in e.parameter
+      payload = {
+        name: e.parameter.name,
+        email: e.parameter.email,
+        results_json: JSON.parse(e.parameter.results_json || '{}')
+      };
+    }
 
     // Validate required fields
     if (!payload.name || typeof payload.name !== 'string') {
