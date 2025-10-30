@@ -24,6 +24,15 @@ body {
   overflow-x: hidden;
 }
 
+body::-webkit-scrollbar {
+  display: none;
+}
+
+body {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 .quiz-container {
   max-width: 800px;
   margin: 0 auto;
