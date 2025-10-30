@@ -74,7 +74,7 @@
       </div>
 
       <div class="note" style="background:#fff9e6;border-left:4px solid #ffc107;padding:12px;margin:20px 0;font-size:13px;color:#666">
-        <strong>Note:</strong> All fields are required. <code>results_json</code> must include <code>score</code> (number) and <code>version</code> (string).
+        <strong>Note:</strong> <code>results_json</code> must include <code>score</code> (number) and <code>version</code> (string).
       </div>
 
       <button type="submit" class="btn" id="submitBtn">Submit Results</button>
@@ -82,7 +82,7 @@
   </div>
 
   <script>
-    const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwN3B4td-NV2PEC0bn_ARjXFOOWtOZAQ29OxHIgXkTzppAxMTNtFfe76uQV_z8UzaI/exec';
+    const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyPvHG7VREy4jRSdCdG1qRPJr2rPgcQVUt6vHCS8rW-7-eOQUK5AlG41XAQ76BRYZs/exec';
 
     const form = document.getElementById('resultsForm');
     const messageEl = document.getElementById('message');
@@ -96,7 +96,7 @@
     }
 
     function validateEmail(email) {
-      return /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email);
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     }
 
     function parseAndValidateResults(jsonText) {
@@ -175,4 +175,5 @@
   </script>
 </body>
 </html>
+
 
