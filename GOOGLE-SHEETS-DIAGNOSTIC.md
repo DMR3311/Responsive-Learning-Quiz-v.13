@@ -1,134 +1,122 @@
-# Google Sheets Integration Diagnostic
+# Google Apps Script Deployment Diagnostic
 
 ## Current Status
-The quiz app is attempting to send data to Google Sheets but data is not appearing in the spreadsheet.
 
-## Issues Identified
+Your Google Apps Script deployment is redirecting to Google Drive error pages. This means the deployment is not correctly pointing to your updated code.
 
-### 1. ✅ FIXED: Missing Environment Variable
-- **Problem**: `.env` was missing `VITE_GOOGLE_APPS_SCRIPT_URL`
-- **Solution**: Added to `.env` file
-- **Status**: FIXED
+## How to Check What's Deployed
 
-### 2. ✅ FIXED: Large Payload Size
-- **Problem**: HTML report in payload was very large (could exceed 100KB limit)
-- **Solution**: Removed `html_report` field from payload
-- **Status**: FIXED
+### Step 1: View Deployments
 
-### 3. ✅ FIXED: No-CORS Mode Hiding Errors
-- **Problem**: Using `mode: 'no-cors'` prevented seeing response/error details
-- **Solution**: Removed `mode: 'no-cors'` and added comprehensive logging
-- **Status**: FIXED
+1. Go to your Apps Script editor
+2. Click **Deploy** → **Manage deployments**
+3. You should see a list of all deployments
 
-### 4. ⚠️ NEEDS VERIFICATION: Google Apps Script Deployment
+### Step 2: Check Active Deployment
 
-The Google Apps Script must be deployed with these settings:
-- **Execute as**: Me (your Google account)
-- **Who has access**: Anyone
+Look at the deployment with URL ending in `...3InpD6ZPmvzQi6O3pAcSfPzHpJ3Q/exec`
 
-To verify/fix:
-1. Open the script editor: https://script.google.com/
-2. Find the project with the script
-3. Click "Deploy" → "Manage deployments"
-4. Verify or create a new deployment with:
-   - Type: Web app
-   - Execute as: Me
-   - Who has access: Anyone
-5. Copy the new deployment URL if changed
+Check:
+- **Version**: What version is it using? (Should say "@1", "@2", etc.)
+- **Status**: Is it "Active"?
+- **Last modified**: When was it last updated?
 
-### 5. ⚠️ NEEDS VERIFICATION: Spreadsheet Permissions
+### Step 3: View Execution Log
 
-The spreadsheet at `1Dtp2HWlVhtPHxfH2aESoN2xT-gMo4jSrJzuvmpSUbDk` must be:
-- Owned by or shared with the Google account that deployed the script
-- The script must have permission to write to it
+1. In Apps Script editor, click **Executions** (clock icon on left sidebar)
+2. Look for recent executions
+3. Click on any failed executions to see the error
 
-To verify:
-1. Open spreadsheet: https://docs.google.com/spreadsheets/d/1Dtp2HWlVhtPHxfH2aESoN2xT-gMo4jSrJzuvmpSUbDk/edit
-2. Check that a "Submissions" sheet exists or will be created automatically
-3. Verify the Google account that deployed the Apps Script has Editor access
+This will show you EXACTLY what code is running and what errors occur.
 
-## Testing Steps
+---
 
-### Step 1: Test the Integration with Browser Console
-1. Open your quiz app
-2. Open browser DevTools (F12)
-3. Go to Console tab
-4. Complete a quiz
-5. Look for logs starting with `[GoogleSheets]`:
-   - `[GoogleSheets] Webhook URL:` - Should show the script URL
-   - `[GoogleSheets] Sending data:` - Should show the payload
-   - `[GoogleSheets] Payload size:` - Should be under 100KB
-   - `[GoogleSheets] Response status:` - Should be 200
-   - `[GoogleSheets] Success response:` - Should show `{ok: true, ...}`
+## How to Properly Update the Deployment
 
-### Step 2: Use Test Page
-1. Open `test-google-sheets.html` in your browser
-2. Click "Test Health Check" - Should return "OK"
-3. Click "Test Minimal POST" - Should succeed and show response
-4. Click "Test Full Quiz Data" - Should succeed
-5. Click "Open Spreadsheet" - Verify data appears in "Submissions" sheet
+### Option A: Update Existing Deployment (Recommended)
 
-### Step 3: Check Spreadsheet
-1. Open: https://docs.google.com/spreadsheets/d/1Dtp2HWlVhtPHxfH2aESoN2xT-gMo4jSrJzuvmpSUbDk/edit
-2. Look for "Submissions" sheet
-3. Check for new rows with test data
+1. **Copy new code**: Get all code from `GOOGLE-APPS-SCRIPT-SIMPLE.gs`
+2. **Paste in editor**: Replace ALL code in the Apps Script editor
+3. **Save**: Click save icon (Ctrl+S / Cmd+S)
+4. **Deploy → Manage deployments**
+5. Click the **pencil/edit icon** next to your current deployment
+6. **Version**: Click dropdown and select **"New version"**
+7. **Description**: Type "Fixed CORS handling" (or anything)
+8. Click **Deploy**
+9. Wait for "Deployment updated successfully"
 
-## Expected Payload Structure
+The URL stays the same, but the code updates.
 
-```json
-{
-  "name": "User Name",
-  "email": "user@example.com",
-  "results_json": {
-    "version": "v1.0",
-    "score": "24/30",
-    "summary": {
-      "accuracy": 80,
-      "mode": "practice",
-      "total_questions": 30,
-      "mastery_answers": 24,
-      "proficient_answers": 4,
-      "developing_answers": 2,
-      "avg_time_ms": 15000,
-      "duration_sec": 450,
-      "domains": [...]
-    },
-    "detailed_history": [...]
-  }
-}
+### Option B: Create Fresh Deployment
+
+If Option A doesn't work:
+
+1. **Deploy → Manage deployments**
+2. **Archive** all old deployments (click trash icon)
+3. Close the dialog
+4. **Deploy → New deployment**
+5. Click gear icon → Select **Web app**
+6. Configure:
+   - Description: "Quiz v4"
+   - Execute as: **Me**
+   - Who has access: **Anyone**
+7. Click **Deploy**
+8. Copy the **NEW URL**
+9. Update `.env` with the new URL
+
+## Quick Test
+
+After deploying, immediately test in your browser:
+
+### Test 1: GET Request
+
+Open this URL in your browser:
+```
+https://script.google.com/macros/s/AKfycbwP8QX8slL8sLsL34GAE5ceQB7zNlAFFVmfKRl3InpD6ZPmvzQi6O3pAcSfPzHpJ3Q/exec
 ```
 
-## Common Error Messages
+**Expected**: You should see plain text: `OK - Script is running`
 
-### "Missing or invalid name"
-- Check that `user.name` exists and is not empty
-- Verify user is logged in (not guest mode)
+**If you see**: Google Drive error page, the deployment is still wrong.
 
-### "Invalid email address"
-- Check that `user.email` is a valid email format
-- Verify user authentication state
+### Test 2: Form POST
 
-### "Payload too large"
-- Check `[GoogleSheets] Payload size` in console
-- Should be under 100KB (100,000 bytes)
+Open browser console (F12), paste and run:
 
-### "Rate limit exceeded"
-- Script limits 10 requests per IP per 60 seconds
-- Wait a minute and try again
+```javascript
+fetch('https://script.google.com/macros/s/AKfycbwP8QX8slL8sLsL34GAE5ceQB7zNlAFFVmfKRl3InpD6ZPmvzQi6O3pAcSfPzHpJ3Q/exec', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  body: 'name=Browser Test&email=test@test.com&results_json=' + encodeURIComponent('{"version":"v1.0","score":"5/10"}')
+})
+.then(r => r.json())
+.then(d => console.log('Result:', d))
+.catch(e => console.error('Error:', e));
+```
 
-### HTTP 403 or 401
-- Google Apps Script deployment settings are incorrect
-- Redeploy with "Anyone" access
+**Expected**: Console shows: `Result: {ok: true, message: "Data saved successfully"}`
 
-### No response / Network error
-- Check internet connection
-- Verify script URL is correct
-- Check browser console for CORS errors
+**If you see**: Network error or Google Drive page, deployment still wrong.
 
-## Next Steps
+## Common Mistakes
 
-1. **Enable detailed logging**: The app now has comprehensive console logging
-2. **Test with test page**: Use `test-google-sheets.html` to isolate issues
-3. **Verify deployment**: Check Google Apps Script deployment settings
-4. **Check spreadsheet**: Verify data is actually not appearing vs. appearing in wrong place
-5. **Review logs**: Share console output if errors persist
+### ❌ Just saving the code
+Saving doesn't update the deployment. You must explicitly deploy.
+
+### ❌ Running test function only
+The `testSubmission()` function works differently than web requests. Just because the test works doesn't mean the web deployment works.
+
+### ❌ Not creating new version
+If you edit a deployment, you MUST select "New version" from the dropdown.
+
+### ❌ Wrong deployment is active
+If you have multiple deployments, make sure you're updating the RIGHT one.
+
+---
+
+## Still Not Working?
+
+Share the output from:
+1. What do you see in **Deploy → Manage deployments**? (version number, when updated)
+2. What shows in **Executions** log when you try to submit?
+3. What happens when you open the GET test URL in browser?
