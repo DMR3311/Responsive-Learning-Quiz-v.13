@@ -1,49 +1,4 @@
-// src/utils/leadCapture.js
-const GOOGLE_APPS_SCRIPT_URL = import.meta.env.VITE_GOOGLE_APPS_SCRIPT_URL || '';
-
-function toFormBody(obj) {
-  const params = new URLSearchParams();
-  Object.entries(obj).forEach(([k, v]) => {
-    params.set(k, typeof v === 'object' ? JSON.stringify(v) : String(v ?? ''));
-  });
-  return params;
-}
-
-export async function captureLeadAndResults(data) {
-  if (!GOOGLE_APPS_SCRIPT_URL) {
-    console.warn('[LeadCapture] Google Apps Script URL not configured');
-    return { ok: false, error: 'Integration not configured' };
-  }
-
-  const payload = {
-    name: data.name?.trim() || '',
-    email: (data.email || '').trim().toLowerCase(),
-    results_json: data.results_json || {},
-    source_url: typeof window !== 'undefined' ? window.location.href : '',
-    user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : ''
-  };
-
-  try {
-    // IMPORTANT: No headers, no JSON. Use form body to avoid CORS preflight.
-    const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
-      method: 'POST',
-      body: toFormBody(payload)
-    });
-
-    // GAS returns JSON text — parse safely
-    const text = await response.text();
-    let result;
-    try {
-      result = JSON.parse(text);
-    } catch {
-      result = { ok: false, error: 'Invalid response from Apps Script', raw: text };
-    }
-
-    // src/utils/leadCapture.js
-
-// --- Low-level sender: always use the Vercel proxy ---
 async function postToSheets({ name, email, results_json }) {
-  // basic client-side sanity checks
   const N = String(name || '').trim();
   const E = String(email || '').trim().toLowerCase();
   if (!N) throw new Error('Name required');
@@ -75,20 +30,16 @@ async function postToSheets({ name, email, results_json }) {
   return data;
 }
 
-// --- Public API used by your app ---
-
-// Single entry point your code can call directly if it already has results
 export async function captureLeadAndResults({ name, email, results_json }) {
   try {
     const result = await postToSheets({ name, email, results_json });
-    return result; // { ok: true, ... } from GAS proxy
+    return result;
   } catch (err) {
     console.error('[LeadCapture] Network/logic error:', err);
     return { ok: false, error: err.message };
   }
 }
 
-// Fire when user starts the quiz (captures initial lead)
 export async function captureInitialLead(name, email) {
   return captureLeadAndResults({
     name,
@@ -102,7 +53,6 @@ export async function captureInitialLead(name, email) {
   });
 }
 
-// Fire when user finishes the quiz (captures full results)
 export async function captureQuizResults(name, email, quizResults) {
   const resultsPayload = {
     version: 'v1.0',
@@ -120,4 +70,3 @@ export async function captureQuizResults(name, email, quizResults) {
 
   return captureLeadAndResults({ name, email, results_json: resultsPayload });
 }
-
