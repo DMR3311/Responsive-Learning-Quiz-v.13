@@ -36,15 +36,6 @@ export function AuthForm({ onAuthSuccess }) {
       if (signUpError) throw signUpError;
 
       if (authData?.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .upsert({
-            id: authData.user.id,
-            username: name
-          });
-
-        if (profileError) console.error('Profile creation error:', profileError);
-
         const userData = {
           id: authData.user.id,
           name,

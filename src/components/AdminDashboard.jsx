@@ -44,7 +44,7 @@ export default function AdminDashboard({ onLogout, adminPassword }) {
 
   const exportToCSV = () => {
     try {
-      let csv = 'Session ID,Email,Name,Mode,Final Score,Questions Answered,Optimal Answers,Started At,Completed At,Duration (min),Question ID,Domain,Selected Option,Answer Class,Score Delta,Time Taken (s)\n';
+      let csv = 'Session ID,Email,Mode,Final Score,Questions Answered,Optimal Answers,Started At,Completed At,Duration (min),Question ID,Domain,Selected Option,Answer Class,Score Delta,Time Taken (s)\n';
 
       sessions.forEach(session => {
         const duration = session.completed_at && session.started_at
@@ -55,10 +55,10 @@ export default function AdminDashboard({ onLogout, adminPassword }) {
 
         if (sessionAnswers.length > 0) {
           sessionAnswers.forEach(answer => {
-            csv += `"${session.id}","${session.profiles?.email || 'N/A'}","${session.profiles?.full_name || 'N/A'}","${session.mode}",${session.final_score},${session.questions_answered},${session.optimal_answers},"${session.started_at}","${session.completed_at || 'N/A'}",${duration},"${answer.question_id}","${answer.domain}","${answer.selected_option}","${answer.answer_class}",${answer.score_delta},${answer.time_taken_seconds || 'N/A'}\n`;
+            csv += `"${session.id}","${session.email || 'N/A'}","${session.mode}",${session.final_score},${session.questions_answered},${session.optimal_answers},"${session.started_at}","${session.completed_at || 'N/A'}",${duration},"${answer.question_id}","${answer.domain}","${answer.selected_option}","${answer.answer_class}",${answer.score_delta},${answer.time_taken_seconds || 'N/A'}\n`;
           });
         } else {
-          csv += `"${session.id}","${session.profiles?.email || 'N/A'}","${session.profiles?.full_name || 'N/A'}","${session.mode}",${session.final_score},${session.questions_answered},${session.optimal_answers},"${session.started_at}","${session.completed_at || 'N/A'}",${duration},"N/A","N/A","N/A","N/A","N/A","N/A"\n`;
+          csv += `"${session.id}","${session.email || 'N/A'}","${session.mode}",${session.final_score},${session.questions_answered},${session.optimal_answers},"${session.started_at}","${session.completed_at || 'N/A'}",${duration},"N/A","N/A","N/A","N/A","N/A","N/A"\n`;
         }
       });
 
@@ -135,7 +135,6 @@ export default function AdminDashboard({ onLogout, adminPassword }) {
           <thead>
             <tr>
               <th>Email</th>
-              <th>Name</th>
               <th>Mode</th>
               <th>Score</th>
               <th>Questions</th>
@@ -148,8 +147,7 @@ export default function AdminDashboard({ onLogout, adminPassword }) {
           <tbody>
             {filteredSessions.map(session => (
               <tr key={session.id} className={!session.completed_at ? 'incomplete' : ''}>
-                <td>{session.profiles?.email || 'N/A'}</td>
-                <td>{session.profiles?.full_name || 'N/A'}</td>
+                <td>{session.email || 'N/A'}</td>
                 <td><span className="mode-badge">{session.mode}</span></td>
                 <td>{session.final_score}</td>
                 <td>{session.questions_answered}</td>

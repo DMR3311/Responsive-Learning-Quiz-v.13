@@ -92,14 +92,15 @@ export async function getUserProfile(userId) {
     if (!userId || userId === 'guest') return null;
     if (!supabase) return null;
 
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .maybeSingle();
+    // Profile data is stored in auth.users metadata
+    const { data: { user }, error } = await supabase.auth.getUser();
 
     if (error) throw error;
-    return data;
+    return user ? {
+      id: user.id,
+      name: user.user_metadata?.name || user.user_metadata?.display_name,
+      email: user.email
+    } : null;
   } catch (error) {
     console.error('Error getting user profile:', error);
     return null;
