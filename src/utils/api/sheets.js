@@ -1,47 +1,31 @@
-// api/sheets.js
+// /api/sheets.js
 export default async function handler(req, res) {
-  // Allow these origins to call the API (your WP page + quiz app)
-  const allowed = [
-    'https://braintrain.org',
-    'https://www.braintrain.org',
-    'https://responsive-learning-quiz-v-13.vercel.app'
-  ];
-  const origin = req.headers.origin || '';
-  if (allowed.includes(origin)) res.setHeader('Access-Control-Allow-Origin', origin);
-  res.setHeader('Vary', 'Origin');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method !== 'POST') {
+    return res.status(405).json({ ok: false, error: 'Method Not Allowed' });
+  }
 
-  if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ ok: false, error: 'Method not allowed' });
+  const GAS_WEB_APP_URL = process.env.GAS_WEB_APP_URL;
+  if (!GAS_WEB_APP_URL) {
+    return res.status(500).json({ ok: false, error: 'GAS_WEB_APP_URL is not set' });
+  }
 
   try {
-    const { name, email, results_json, source_url, user_agent } = req.body || {};
-    if (!name || !email || !results_json) {
-      return res.status(400).json({ ok: false, error: 'Missing name, email, or results_json' });
-    }
+    // Forward the body to Google Apps Script Web App
+    const f = await fetch(GAS_WEB_APP_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      // Vercel already parsed JSON into req.body if content-type is application/json
+      body: JSON.stringify(req.body || {}),
+    });
 
-    const gasUrl = process.env.GAS_WEB_APP_URL;
-    if (!gasUrl) return res.status(500).json({ ok: false, error: 'GAS_WEB_APP_URL not configured' });
-
-    // Send to GAS as form-encoded (simplest for Apps Script)
-    const form = new URLSearchParams();
-    form.set('name', name);
-    form.set('email', email);
-    form.set('results_json', JSON.stringify(results_json));
-    form.set('source_url', source_url || '');
-    form.set('user_agent', user_agent || '');
-
-    const forward = await fetch(gasUrl, { method: 'POST', body: form });
-    const text = await forward.text();
-
+    const text = await f.text();
     let data;
-    try { data = JSON.parse(text); } catch { data = { ok: true, raw: text }; }
+    try { data = JSON.parse(text); } catch { data = { ok: f.ok, raw: text }; }
 
-    const status = forward.ok ? 200 : 502;
-    res.status(status).json(data);
+    // Mirror GAS status
+    return res.status(f.ok ? 200 : f.status).json(data);
   } catch (err) {
-    console.error('[api/sheets] error', err);
-    res.status(500).json({ ok: false, error: err.message });
+    console.error('[api/sheets] Proxy error:', err);
+    return res.status(502).json({ ok: false, error: 'Proxy error: ' + err.message });
   }
 }
