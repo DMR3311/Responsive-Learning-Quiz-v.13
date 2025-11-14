@@ -1,5 +1,4 @@
 import React from "react";
-import "./Question.css"; // optional—only if you want a separate style file
 
 function Question({ data, selectedOption, setSelectedOption }) {
   if (!data) return null;
@@ -12,9 +11,7 @@ function Question({ data, selectedOption, setSelectedOption }) {
         {data.options.map((opt, i) => (
           <li key={i}>
             <button
-              className={`option-btn ${
-                selectedOption === opt ? "selected" : ""
-              }`}
+              className={\`option-btn \${selectedOption === opt ? "selected" : ""}\`}
               onClick={() => setSelectedOption(opt)}
             >
               {opt}
