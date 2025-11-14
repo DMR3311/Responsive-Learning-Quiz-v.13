@@ -96,7 +96,7 @@ function App() {
     }
 
     setGameState('results');
-  }; // <-- FIXED: only ONE closing brace here.
+  };
 
   // ---------- RENDER ---------- //
   if (gameState === 'start') {
