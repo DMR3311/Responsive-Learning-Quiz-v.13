@@ -53,6 +53,33 @@ function App() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [gameState]);
+  useEffect(() => {
+    const sendHeight = () => {
+      try {
+        const height = document.documentElement.scrollHeight;
+        window.parent.postMessage({ quizHeight: height }, '*');
+      } catch (e) {
+        console.error('Failed to postMessage quiz height', e);
+      }
+    };
+
+    sendHeight();
+
+    const observer = new MutationObserver(sendHeight);
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true
+    });
+
+    window.addEventListener('resize', sendHeight);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', sendHeight);
+    };
+  }, []);
+
 
   useEffect(() => {
     if (gameState !== 'quiz' || showFeedback || !engine) return;
@@ -227,6 +254,26 @@ function App() {
       }
     } catch (error) {
       console.error('Failed to complete session in database:', error);
+    }
+
+
+    try {
+      await fetch('https://braintrain.org/wp-json/braintrain/v1/submit-quiz', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          score: finalScore,
+          totalQuestions: history.length,
+          optimalAnswers,
+          mode: selectedMode,
+          userEmail: user && user.email ? user.email : null,
+          timestamp: new Date().toISOString()
+        })
+      });
+    } catch (error) {
+      console.error('Failed to send quiz results to WordPress:', error);
     }
 
     setGameState('results');
