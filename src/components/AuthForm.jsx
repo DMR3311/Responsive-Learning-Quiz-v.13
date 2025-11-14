@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { captureInitialLead } from '../utils/leadCapture';
 
 export function AuthForm({ onAuthSuccess }) {
   const [name, setName] = useState('');
@@ -36,6 +35,15 @@ export function AuthForm({ onAuthSuccess }) {
       if (signUpError) throw signUpError;
 
       if (authData?.user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .upsert({
+            id: authData.user.id,
+            username: name
+          });
+
+        if (profileError) console.error('Profile creation error:', profileError);
+
         const userData = {
           id: authData.user.id,
           name,
@@ -44,11 +52,6 @@ export function AuthForm({ onAuthSuccess }) {
         };
 
         localStorage.setItem('blueprint_user', JSON.stringify(userData));
-
-        captureInitialLead(name, email).catch(err => {
-          console.error('Lead capture error:', err);
-        });
-
         onAuthSuccess(false, true);
       }
     } catch (err) {
@@ -71,7 +74,7 @@ export function AuthForm({ onAuthSuccess }) {
           <img src="/braintrain logo.png" alt="Braintrain Labs" className="auth-braintrain-logo" />
         </div>
         <h1>Welcome to Braintrain Labs</h1>
-        <p className="auth-subtitle">Let's Find Your Learning Superpowers!</p>
+        <p className="auth-subtitle">Unlock your cognitive potential with our <strong>Responsive Learning Machine</strong></p>
 
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
@@ -107,7 +110,7 @@ export function AuthForm({ onAuthSuccess }) {
             className="btn btn-primary btn-full auth-start-button"
             disabled={loading}
           >
-            {loading ? 'Loading...' : 'Start the Quiz'}
+            {loading ? 'Loading...' : 'Begin Your Journey'}
           </button>
         </form>
 

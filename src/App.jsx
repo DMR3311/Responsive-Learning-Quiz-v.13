@@ -12,9 +12,9 @@ import AdminDashboard from './components/AdminDashboard';
 import { getFeedbackMessage, getEncouragementMessage } from './utils/feedbackMessages';
 import { getDomainConfig } from './utils/domainConfig';
 import { sendToGoogleSheets, formatQuizDataForSheets } from './utils/googleSheets';
+import { sendToWordPress } from './utils/wordpress';
 import { createQuizSession, saveQuizAnswer, completeQuizSession } from './utils/database';
-import { smoothScrollToTop } from './utils/smoothScroll';
-import quizData from '../public/items.json';
+import quizData from '../data/items.json';
 import './App.css';
 
 function App() {
@@ -48,25 +48,11 @@ function App() {
         console.error('Failed to parse saved user');
       }
     }
-
-    const adminSession = localStorage.getItem('admin_session');
-    if (adminSession) {
-      try {
-        const session = JSON.parse(adminSession);
-        const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD || 'Results@2025';
-        setIsAdmin(true);
-        setAdminPassword(adminPassword);
-        setShowAdmin(true);
-      } catch (e) {
-        console.error('Failed to parse admin session');
-      }
-    }
-
     setAuthChecked(true);
   }, []);
 
   useEffect(() => {
-    smoothScrollToTop(500);
+    window.scrollTo(0, 0);
   }, [gameState]);
 
   useEffect(() => {
@@ -147,7 +133,7 @@ function App() {
       setQuestionNumber(prev => prev + 1);
       setQuestionStartTime(Date.now());
       setLastActivityTime(Date.now());
-      smoothScrollToTop(400);
+      window.scrollTo(0, 0);
     } else {
       completeQuiz(engineInstance);
     }
@@ -212,39 +198,64 @@ function App() {
     loadNextQuestion(engine);
   };
 
-  const completeQuiz = async (engineInstance) => {
-    const history = engineInstance.getHistory();
-    const finalScore = engineInstance.getScore();
-    const optimalAnswers = history.filter(h => h.answerClass === 'mastery').length;
+  
+const completeQuiz = async (engineInstance) => {
+  const history = engineInstance.getHistory();
+  const finalScore = engineInstance.getScore();
+  const optimalAnswers = history.filter(h => h.answerClass === 'mastery').length;
 
-    try {
-      const quizData = formatQuizDataForSheets(
-        user,
-        selectedMode,
-        history,
-        finalScore,
-        questionTimes
-      );
+  const domainCounts = {};
+  const domainScores = {};
+  history.forEach(entry => {
+    const domain = entry.domain || 'unknown';
+    if (!domainCounts[domain]) domainCounts[domain] = 0;
+    domainCounts[domain] += 1;
 
-      await sendToGoogleSheets(quizData);
-    } catch (error) {
-      console.error('Failed to send to Google Sheets:', error);
+    let scoreValue = 0;
+    if (entry.answerClass === 'mastery') scoreValue = 3;
+    else if (entry.answerClass === 'proficient') scoreValue = 2;
+    else if (entry.answerClass === 'developing') scoreValue = 1;
+
+    if (!domainScores[domain]) domainScores[domain] = 0;
+    domainScores[domain] += scoreValue;
+  });
+
+  const quizSummaryForWordPress = {
+    user_hash: user?.id || user?.email || ('guest-' + Math.random().toString(36).slice(2)),
+    age_band: engineInstance.currentAgeBand || '7-12',
+    items_asked: history.length,
+    domain_counts: domainCounts,
+    domain_scores: domainScores,
+    raw_picks: history
+  };
+
+  try {
+    const quizData = formatQuizDataForSheets(
+      user, history, finalScore, optimalAnswers,
+      selectedMode, selectedDomain, questionTimes
+    );
+    await sendToGoogleSheets(quizData);
+  } catch (err) {
+    console.error('Sheets failed:', err);
+  }
+
+  try {
+    if (dbSessionId) {
+      await completeQuizSession(dbSessionId, finalScore, history.length, optimalAnswers);
     }
+  } catch (err) {
+    console.error('DB failed:', err);
+  }
 
-    try {
-      if (dbSessionId) {
-        await completeQuizSession(
-          dbSessionId,
-          finalScore,
-          history.length,
-          optimalAnswers
-        );
-      }
-    } catch (error) {
-      console.error('Failed to complete session in database:', error);
-    }
+  try {
+    await sendToWordPress(quizSummaryForWordPress);
+  } catch (err) {
+    console.error('WP failed:', err);
+  }
 
-    setGameState('results');
+  setGameState('results');
+};
+
   };
 
   const resetQuiz = () => {
@@ -276,7 +287,7 @@ function App() {
     if (!isAdmin) {
       return <AdminLogin onLogin={(password) => { setIsAdmin(true); setAdminPassword(password); }} />;
     }
-    return <AdminDashboard adminPassword={adminPassword} onLogout={() => { setIsAdmin(false); setShowAdmin(false); setAdminPassword(null); localStorage.removeItem('admin_session'); }} />;
+    return <AdminDashboard adminPassword={adminPassword} onLogout={() => { setIsAdmin(false); setShowAdmin(false); setAdminPassword(null); }} />;
   }
 
   if (!user) {

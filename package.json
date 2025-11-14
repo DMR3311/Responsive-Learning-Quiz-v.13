@@ -1,15 +1,12 @@
 {
   "name": "blueprint-quiz",
   "private": true,
-  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview --port 4173",
-    "deploy:vercel": "npm run build && npx vercel deploy --prebuilt --prod"
+    "preview": "vite preview"
   },
-  "engines": { "node": ">=20.19.0" },
   "dependencies": {
     "@supabase/supabase-js": "^2.58.0",
     "@vitejs/plugin-react": "^5.0.4",

@@ -3,20 +3,25 @@
 ## Quick Start: Deploy to Vercel (Recommended - 2 minutes)
 
 ### Option 1: Deploy via Vercel CLI
-1. Authenticate once (or whenever you change computers):
+1. Install Vercel CLI:
    ```bash
-   npx vercel login
+   npm i -g vercel
    ```
 
-2. Publish the dashboard with the prebuilt bundle helper:
+2. From your project directory, run:
    ```bash
-   npm run deploy:vercel
+   vercel
    ```
-   This script runs `npm run build` and then calls `vercel deploy --prebuilt --prod` so the exact bundle you just built ships to your Vercel project.
 
-3. The first time you deploy you'll be prompted in your terminal to either **create** a new project or **link** to an existing one inside your Vercel account (for example, the project that owns `braintrain.org`). Subsequent publishes reuse that link automatically, so you can simply re-run the script for updates.
+3. Follow the prompts:
+   - Set up and deploy: **Yes**
+   - Which scope: Choose your account
+   - Link to existing project: **No**
+   - Project name: **braintrain-quiz** (or your choice)
+   - Directory: **./** (just press Enter)
+   - Override settings: **No**
 
-4. When the command finishes it prints the production URL (e.g. `https://braintrain-quiz.vercel.app`). Copy that URL into WordPress or visit it directly to confirm the dashboard is live.
+4. Your quiz will be live! You'll get a URL like: `https://braintrain-quiz.vercel.app`
 
 ### Option 2: Deploy via Vercel Dashboard
 1. Go to [vercel.com](https://vercel.com) and sign up/login

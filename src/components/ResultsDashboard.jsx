@@ -3,7 +3,6 @@ import { supabase } from '../lib/supabase';
 import { generatePDFReport } from '../utils/pdfGenerator';
 import { AnimatedStats } from './AnimatedStats';
 import { getDomainConfig } from '../utils/domainConfig';
-import { captureQuizResults } from '../utils/leadCapture';
 
 export function ResultsDashboard({ history, finalScore, user, onReset, onViewHistory, questionTimes = [], streak = 0, selectedMode, selectedDomain = null }) {
   const [percentile, setPercentile] = useState(null);
@@ -18,28 +17,6 @@ export function ResultsDashboard({ history, finalScore, user, onReset, onViewHis
     const timer = setTimeout(() => {
       setShowCelebration(false);
     }, 3000);
-
-    if (user && !user.isGuest && user.email && user.name) {
-      const totalQuestions = history.length;
-      const correctAnswers = history.filter(h => h.answerClass === 'mastery').length;
-      const avgTime = questionTimes.length > 0
-        ? questionTimes.reduce((sum, time) => sum + time, 0) / questionTimes.length
-        : 0;
-
-      captureQuizResults(user.name, user.email, {
-        totalScore: finalScore,
-        percentage: overallAccuracy,
-        domainScores: getDomainBreakdown(),
-        difficulty: 'mixed',
-        mode: selectedMode || 'practice',
-        totalQuestions,
-        correctAnswers,
-        duration: Math.round(avgTime * totalQuestions),
-        streak
-      }).catch(err => {
-        console.error('Failed to capture quiz results:', err);
-      });
-    }
 
     return () => clearTimeout(timer);
   }, [history, finalScore, user]);
@@ -168,11 +145,11 @@ export function ResultsDashboard({ history, finalScore, user, onReset, onViewHis
         },
         body: JSON.stringify({
           to: user.email,
-          userName: user.name || user.email.split('@')[0],
+          userName: user.email.split('@')[0],
           finalScore,
           questionsAnswered: history.length,
-          optimalAnswers: masteryAnswers,
-          accuracy: overallAccuracy,
+          masteryAnswers,
+          mastery: overallAccuracy,
           reportUrl: window.location.href
         })
       });
@@ -404,9 +381,18 @@ export function ResultsDashboard({ history, finalScore, user, onReset, onViewHis
           Download Report
         </button>
         {!user?.isGuest && (
-          <button className="btn btn-secondary" onClick={onViewHistory}>
-            View History
-          </button>
+          <>
+            <button
+              className="btn btn-secondary"
+              onClick={handleEmailResults}
+              disabled={emailSending || emailSent}
+            >
+              {emailSending ? 'Sending...' : emailSent ? 'Email Sent!' : 'Email Results'}
+            </button>
+            <button className="btn btn-secondary" onClick={onViewHistory}>
+              View History
+            </button>
+          </>
         )}
       </div>
     </div>
