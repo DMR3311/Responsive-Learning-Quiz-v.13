@@ -509,23 +509,27 @@ const completeQuiz = async (engineInstance) => {
         )}
 
         <div className="button-container">
-          {!showFeedback ? (
-            <button
-              className="btn btn-primary"
-              onClick={handleSubmit}
-              disabled={!selectedOption}
-            >
-              Submit Answer
-            </button>
-          ) : (
-            <button className="btn btn-primary" onClick={handleNext}>
-              Next Question
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
+  {!showFeedback ? (
+    <button
+      className="btn btn-primary"
+      onClick={handleSubmit}
+      disabled={!selectedOption}
+    >
+      Submit Answer
+    </button>
+  ) : (
+    <button className="btn btn-primary" onClick={handleNext}>
+      Next Question
+    </button>
+  )}
+</div>
+
+</div>  {/* closes main question-content container */}
+</div>  {/* closes main quiz content wrapper */}
+
+);  // closes return()
+
+} // closes App component
 
 export default App;
+
