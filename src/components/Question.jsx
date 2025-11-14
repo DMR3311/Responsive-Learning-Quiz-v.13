@@ -11,7 +11,7 @@ function Question({ data, selectedOption, setSelectedOption }) {
         {data.options.map((opt, i) => (
           <li key={i}>
             <button
-              className={\`option-btn \${selectedOption === opt ? "selected" : ""}\`}
+              className={`option-btn ${selectedOption === opt ? "selected" : ""}`}
               onClick={() => setSelectedOption(opt)}
             >
               {opt}
@@ -24,3 +24,4 @@ function Question({ data, selectedOption, setSelectedOption }) {
 }
 
 export default Question;
+
