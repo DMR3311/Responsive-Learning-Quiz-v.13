@@ -22,3 +22,4 @@ function Result({ score, total }) {
 }
 
 export default Result;
+
