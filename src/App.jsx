@@ -80,12 +80,10 @@ function App() {
     });
 
     window.addEventListener('resize', sendHeight);
-    window.addEventListener('load', sendHeight);
 
     return () => {
       observer.disconnect();
       window.removeEventListener('resize', sendHeight);
-      window.removeEventListener('load', sendHeight);
     };
   }, []);
 
