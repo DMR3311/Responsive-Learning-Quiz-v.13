@@ -56,7 +56,14 @@ function App() {
   useEffect(() => {
     const sendHeight = () => {
       try {
-        const height = document.documentElement.scrollHeight;
+        const rootEl = document.getElementById('root');
+        const body = document.body;
+        const doc = document.documentElement;
+        const height = Math.max(
+          rootEl ? rootEl.scrollHeight : 0,
+          body ? body.scrollHeight : 0,
+          doc ? doc.scrollHeight : 0
+        );
         window.parent.postMessage({ quizHeight: height }, '*');
       } catch (e) {
         console.error('Failed to postMessage quiz height', e);
@@ -73,10 +80,12 @@ function App() {
     });
 
     window.addEventListener('resize', sendHeight);
+    window.addEventListener('load', sendHeight);
 
     return () => {
       observer.disconnect();
       window.removeEventListener('resize', sendHeight);
+      window.removeEventListener('load', sendHeight);
     };
   }, []);
 
@@ -268,7 +277,10 @@ function App() {
           totalQuestions: history.length,
           optimalAnswers,
           mode: selectedMode,
+          domain: selectedDomain,
           userEmail: user && user.email ? user.email : null,
+          userName: user && user.name ? user.name : null,
+          userId: user && user.id ? user.id : null,
           timestamp: new Date().toISOString()
         })
       });
