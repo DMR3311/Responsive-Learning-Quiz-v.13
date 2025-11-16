@@ -7,9 +7,12 @@ import { DomainSelector } from './components/DomainSelector';
 import { ProgressBar } from './components/ProgressBar';
 import { ResultsDashboard } from './components/ResultsDashboard';
 import { WelcomeIntro } from './components/WelcomeIntro';
+import AdminLogin from './components/AdminLogin';
+import AdminDashboard from './components/AdminDashboard';
 import { getFeedbackMessage, getEncouragementMessage } from './utils/feedbackMessages';
 import { getDomainConfig } from './utils/domainConfig';
-import { reportQuizResults } from './utils/reportResults';
+import { sendToGoogleSheets, formatQuizDataForSheets } from './utils/googleSheets';
+import { createQuizSession, saveQuizAnswer, completeQuizSession } from './utils/database';
 import quizData from '../data/items.json';
 import './App.css';
 
@@ -17,6 +20,9 @@ function App() {
   const [user, setUser] = useState(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [gameState, setGameState] = useState('mode-select');
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [showAdmin, setShowAdmin] = useState(false);
+  const [adminPassword, setAdminPassword] = useState(null);
   const [selectedMode, setSelectedMode] = useState(null);
   const [selectedDomain, setSelectedDomain] = useState(null);
   const [engine, setEngine] = useState(null);
@@ -30,6 +36,7 @@ function App() {
   const [streak, setStreak] = useState(0);
   const [lastActivityTime, setLastActivityTime] = useState(Date.now());
   const [questionTimes, setQuestionTimes] = useState([]);
+  const [dbSessionId, setDbSessionId] = useState(null);
 
   useEffect(() => {
     const savedUser = localStorage.getItem('blueprint_user');
@@ -44,73 +51,8 @@ function App() {
   }, []);
 
   useEffect(() => {
-    const pendingRaw = localStorage.getItem('pendingReports');
-    if (!pendingRaw) return;
-
-    let pending;
-    try {
-      pending = JSON.parse(pendingRaw);
-    } catch {
-      console.error('Failed to parse pendingReports from localStorage');
-      return;
-    }
-    if (!Array.isArray(pending) || pending.length === 0) return;
-
-    (async () => {
-      const stillPending = [];
-      for (const item of pending) {
-        try {
-          const res = await reportQuizResults(item.summary);
-          if (!res || !res.success) {
-            stillPending.push(item);
-          }
-        } catch (err) {
-          console.error('Failed to resend pending report', err);
-          stillPending.push(item);
-        }
-      }
-      localStorage.setItem('pendingReports', JSON.stringify(stillPending));
-    })();
-  }, []);
-
-
-  useEffect(() => {
     window.scrollTo(0, 0);
   }, [gameState]);
-  useEffect(() => {
-    const sendHeight = () => {
-      try {
-        const rootEl = document.getElementById('root');
-        const body = document.body;
-        const doc = document.documentElement;
-        const height = Math.max(
-          rootEl ? rootEl.scrollHeight : 0,
-          body ? body.scrollHeight : 0,
-          doc ? doc.scrollHeight : 0
-        );
-        window.parent.postMessage({ quizHeight: height }, '*');
-      } catch (e) {
-        console.error('Failed to postMessage quiz height', e);
-      }
-    };
-
-    sendHeight();
-
-    const observer = new MutationObserver(sendHeight);
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-      attributes: true
-    });
-
-    window.addEventListener('resize', sendHeight);
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener('resize', sendHeight);
-    };
-  }, []);
-
 
   useEffect(() => {
     if (gameState !== 'quiz' || showFeedback || !engine) return;
@@ -162,6 +104,16 @@ function App() {
     setGameState('quiz');
     setSessionId(Date.now().toString());
 
+    try {
+      const userEmail = user?.email || user?.user_metadata?.email || null;
+      const dbSession = await createQuizSession(user?.id, selectedMode, userEmail);
+      if (dbSession) {
+        setDbSessionId(dbSession.id);
+      }
+    } catch (error) {
+      console.error('Failed to create quiz session:', error);
+    }
+
     loadNextQuestion(newEngine);
   };
 
@@ -208,7 +160,20 @@ function App() {
     setLastActivityTime(Date.now());
     setQuestionTimes(prev => [...prev, timeTaken]);
 
-
+    try {
+      if (dbSessionId) {
+        await saveQuizAnswer(dbSessionId, {
+          questionId: currentQuestion.id,
+          domain: currentQuestion.domain,
+          selectedOption: selectedOption,
+          answerClass: result.answerClass,
+          scoreDelta: result.points,
+          timeTaken: timeTaken
+        });
+      }
+    } catch (error) {
+      console.error('Failed to save answer:', error);
+    }
 
     let newStreak = streak;
     if (result.answerClass === 'mastery') {
@@ -232,29 +197,40 @@ function App() {
     loadNextQuestion(engine);
   };
 
-
   const completeQuiz = async (engineInstance) => {
     const history = engineInstance.getHistory();
     const finalScore = engineInstance.getScore();
     const optimalAnswers = history.filter(h => h.answerClass === 'mastery').length;
 
     try {
-      await reportQuizResults({
+      const quizData = formatQuizDataForSheets(
         user,
         selectedMode,
-        selectedDomain,
         history,
         finalScore,
-        optimalAnswers,
-        questionTimes,
-      });
+        questionTimes
+      );
+
+      await sendToGoogleSheets(quizData);
     } catch (error) {
-      console.error('Failed to report quiz results:', error);
+      console.error('Failed to send to Google Sheets:', error);
+    }
+
+    try {
+      if (dbSessionId) {
+        await completeQuizSession(
+          dbSessionId,
+          finalScore,
+          history.length,
+          optimalAnswers
+        );
+      }
+    } catch (error) {
+      console.error('Failed to complete session in database:', error);
     }
 
     setGameState('results');
   };
-
 
   const resetQuiz = () => {
     setEngine(null);
@@ -264,6 +240,7 @@ function App() {
     setFeedback(null);
     setQuestionNumber(0);
     setSessionId(null);
+    setDbSessionId(null);
     setSelectedMode(null);
     setSelectedDomain(null);
     setStreak(0);
@@ -279,6 +256,14 @@ function App() {
       </div>
     );
   }
+
+  if (showAdmin) {
+    if (!isAdmin) {
+      return <AdminLogin onLogin={(password) => { setIsAdmin(true); setAdminPassword(password); }} />;
+    }
+    return <AdminDashboard adminPassword={adminPassword} onLogout={() => { setIsAdmin(false); setShowAdmin(false); setAdminPassword(null); }} />;
+  }
+
   if (!user) {
     return <AuthForm onAuthSuccess={handleAuthSuccess} />;
   }
@@ -301,6 +286,24 @@ function App() {
     return (
       <div className="quiz-container">
         <Profile user={user} onSignOut={handleSignOut} />
+        <button
+          onClick={() => setShowAdmin(true)}
+          className="admin-access-btn"
+          style={{
+            position: 'fixed',
+            bottom: '20px',
+            right: '20px',
+            padding: '8px 16px',
+            background: 'rgba(0,0,0,0.1)',
+            border: '1px solid rgba(0,0,0,0.2)',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontSize: '12px',
+            opacity: 0.5
+          }}
+        >
+          Admin
+        </button>
         <ModeSelector
           selectedMode={selectedMode}
           onSelectMode={handleModeSelect}

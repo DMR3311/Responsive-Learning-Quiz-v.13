@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
 import { generatePDFReport } from '../utils/pdfGenerator';
 import { AnimatedStats } from './AnimatedStats';
 import { getDomainConfig } from '../utils/domainConfig';
