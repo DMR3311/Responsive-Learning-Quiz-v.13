@@ -11,8 +11,7 @@ import AdminLogin from './components/AdminLogin';
 import AdminDashboard from './components/AdminDashboard';
 import { getFeedbackMessage, getEncouragementMessage } from './utils/feedbackMessages';
 import { getDomainConfig } from './utils/domainConfig';
-import { sendToGoogleSheets, formatQuizDataForSheets } from './utils/googleSheets';
-import { createQuizSession, saveQuizAnswer, completeQuizSession } from './utils/database';
+import { reportQuizResults } from './utils/reportResults';
 import quizData from '../data/items.json';
 import './App.css';
 
@@ -36,7 +35,7 @@ function App() {
   const [streak, setStreak] = useState(0);
   const [lastActivityTime, setLastActivityTime] = useState(Date.now());
   const [questionTimes, setQuestionTimes] = useState([]);
-  const [dbSessionId, setDbSessionId] = useState(null);
+  
 
   useEffect(() => {
     const savedUser = localStorage.getItem('blueprint_user');
@@ -49,6 +48,23 @@ function App() {
     }
     setAuthChecked(true);
   }, []);
+  useEffect(() => {
+    const pendingRaw = localStorage.getItem('pendingReports');
+    if (!pendingRaw) return;
+    let pending;
+    try { pending = JSON.parse(pendingRaw); } catch { return; }
+    if (!Array.isArray(pending) || pending.length === 0) return;
+
+    (async () => {
+      const still = [];
+      for (const item of pending) {
+        const res = await reportQuizResults(item.summary);
+        if (!res || !res.success) still.push(item);
+      }
+      localStorage.setItem('pendingReports', JSON.stringify(still));
+    })();
+  }, []);
+
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -236,55 +252,15 @@ function App() {
     const finalScore = engineInstance.getScore();
     const optimalAnswers = history.filter(h => h.answerClass === 'mastery').length;
 
-    try {
-      const quizData = formatQuizDataForSheets(
-        user,
-        selectedMode,
-        history,
-        finalScore,
-        questionTimes
-      );
-
-      await sendToGoogleSheets(quizData);
-    } catch (error) {
-      console.error('Failed to send to Google Sheets:', error);
-    }
-
-    try {
-      if (dbSessionId) {
-        await completeQuizSession(
-          dbSessionId,
-          finalScore,
-          history.length,
-          optimalAnswers
-        );
-      }
-    } catch (error) {
-      console.error('Failed to complete session in database:', error);
-    }
-
-
-    try {
-      await fetch('https://braintrain.org/wp-json/braintrain/v1/submit-quiz', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          score: finalScore,
-          totalQuestions: history.length,
-          optimalAnswers,
-          mode: selectedMode,
-          domain: selectedDomain,
-          userEmail: user && user.email ? user.email : null,
-          userName: user && user.name ? user.name : null,
-          userId: user && user.id ? user.id : null,
-          timestamp: new Date().toISOString()
-        })
-      });
-    } catch (error) {
-      console.error('Failed to send quiz results to WordPress:', error);
-    }
+    await reportQuizResults({
+      user,
+      selectedMode,
+      selectedDomain,
+      history,
+      finalScore,
+      optimalAnswers,
+      questionTimes,
+    });
 
     setGameState('results');
   };

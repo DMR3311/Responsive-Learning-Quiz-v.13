@@ -1,25 +1,22 @@
+const WP_ENDPOINT =
+  import.meta.env.VITE_WP_ENDPOINT ||
+  'https://braintrain.org/wp-json/braintrain/v1/results';
 
-// src/utils/wordpress.js
-const WORDPRESS_API_BASE =
-  import.meta.env.VITE_WORDPRESS_API_BASE ||
-  'https://staging3.braintrain.org/wp-json/braintrain/v1';
+const WP_SECRET = import.meta.env.VITE_WP_RESULTS_SECRET || '';
 
-export async function sendToWordPress(quizSummary) {
+export async function sendToWordPress(payload) {
   try {
-    const resp = await fetch(`${WORDPRESS_API_BASE}/submit`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(quizSummary),
+    const headers = { 'Content-Type': 'application/json' };
+    if (WP_SECRET) headers['X-Braintrain-Secret'] = WP_SECRET;
+
+    const resp = await fetch(WP_ENDPOINT, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(payload),
     });
 
-    const text = await resp.text();
-    let json = null;
-    try { json = JSON.parse(text); } catch {}
-
-    return resp.ok
-      ? { success: true, body: json || text }
-      : { success: false, status: resp.status, body: text };
+    return resp.ok ? { success: true } : { success: false };
   } catch (err) {
-    return { success: false, error: String(err) };
+    return { success: false };
   }
 }
