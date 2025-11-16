@@ -7,8 +7,6 @@ import { DomainSelector } from './components/DomainSelector';
 import { ProgressBar } from './components/ProgressBar';
 import { ResultsDashboard } from './components/ResultsDashboard';
 import { WelcomeIntro } from './components/WelcomeIntro';
-import AdminLogin from './components/AdminLogin';
-import AdminDashboard from './components/AdminDashboard';
 import { getFeedbackMessage, getEncouragementMessage } from './utils/feedbackMessages';
 import { getDomainConfig } from './utils/domainConfig';
 import { reportQuizResults } from './utils/reportResults';
@@ -19,9 +17,6 @@ function App() {
   const [user, setUser] = useState(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [gameState, setGameState] = useState('mode-select');
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [showAdmin, setShowAdmin] = useState(false);
-  const [adminPassword, setAdminPassword] = useState(null);
   const [selectedMode, setSelectedMode] = useState(null);
   const [selectedDomain, setSelectedDomain] = useState(null);
   const [engine, setEngine] = useState(null);
@@ -284,14 +279,6 @@ function App() {
       </div>
     );
   }
-
-  if (showAdmin) {
-    if (!isAdmin) {
-      return <AdminLogin onLogin={(password) => { setIsAdmin(true); setAdminPassword(password); }} />;
-    }
-    return <AdminDashboard adminPassword={adminPassword} onLogout={() => { setIsAdmin(false); setShowAdmin(false); setAdminPassword(null); }} />;
-  }
-
   if (!user) {
     return <AuthForm onAuthSuccess={handleAuthSuccess} />;
   }
@@ -314,24 +301,6 @@ function App() {
     return (
       <div className="quiz-container">
         <Profile user={user} onSignOut={handleSignOut} />
-        <button
-          onClick={() => setShowAdmin(true)}
-          className="admin-access-btn"
-          style={{
-            position: 'fixed',
-            bottom: '20px',
-            right: '20px',
-            padding: '8px 16px',
-            background: 'rgba(0,0,0,0.1)',
-            border: '1px solid rgba(0,0,0,0.2)',
-            borderRadius: '4px',
-            cursor: 'pointer',
-            fontSize: '12px',
-            opacity: 0.5
-          }}
-        >
-          Admin
-        </button>
         <ModeSelector
           selectedMode={selectedMode}
           onSelectMode={handleModeSelect}
