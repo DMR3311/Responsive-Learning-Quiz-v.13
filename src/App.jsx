@@ -35,7 +35,6 @@ function App() {
   const [streak, setStreak] = useState(0);
   const [lastActivityTime, setLastActivityTime] = useState(Date.now());
   const [questionTimes, setQuestionTimes] = useState([]);
-  
 
   useEffect(() => {
     const savedUser = localStorage.getItem('blueprint_user');
@@ -48,20 +47,34 @@ function App() {
     }
     setAuthChecked(true);
   }, []);
+
   useEffect(() => {
     const pendingRaw = localStorage.getItem('pendingReports');
     if (!pendingRaw) return;
+
     let pending;
-    try { pending = JSON.parse(pendingRaw); } catch { return; }
+    try {
+      pending = JSON.parse(pendingRaw);
+    } catch {
+      console.error('Failed to parse pendingReports from localStorage');
+      return;
+    }
     if (!Array.isArray(pending) || pending.length === 0) return;
 
     (async () => {
-      const still = [];
+      const stillPending = [];
       for (const item of pending) {
-        const res = await reportQuizResults(item.summary);
-        if (!res || !res.success) still.push(item);
+        try {
+          const res = await reportQuizResults(item.summary);
+          if (!res || !res.success) {
+            stillPending.push(item);
+          }
+        } catch (err) {
+          console.error('Failed to resend pending report', err);
+          stillPending.push(item);
+        }
       }
-      localStorage.setItem('pendingReports', JSON.stringify(still));
+      localStorage.setItem('pendingReports', JSON.stringify(stillPending));
     })();
   }, []);
 
@@ -154,16 +167,6 @@ function App() {
     setGameState('quiz');
     setSessionId(Date.now().toString());
 
-    try {
-      const userEmail = user?.email || user?.user_metadata?.email || null;
-      const dbSession = await createQuizSession(user?.id, selectedMode, userEmail);
-      if (dbSession) {
-        setDbSessionId(dbSession.id);
-      }
-    } catch (error) {
-      console.error('Failed to create quiz session:', error);
-    }
-
     loadNextQuestion(newEngine);
   };
 
@@ -210,20 +213,7 @@ function App() {
     setLastActivityTime(Date.now());
     setQuestionTimes(prev => [...prev, timeTaken]);
 
-    try {
-      if (dbSessionId) {
-        await saveQuizAnswer(dbSessionId, {
-          questionId: currentQuestion.id,
-          domain: currentQuestion.domain,
-          selectedOption: selectedOption,
-          answerClass: result.answerClass,
-          scoreDelta: result.points,
-          timeTaken: timeTaken
-        });
-      }
-    } catch (error) {
-      console.error('Failed to save answer:', error);
-    }
+
 
     let newStreak = streak;
     if (result.answerClass === 'mastery') {
@@ -247,23 +237,29 @@ function App() {
     loadNextQuestion(engine);
   };
 
+
   const completeQuiz = async (engineInstance) => {
     const history = engineInstance.getHistory();
     const finalScore = engineInstance.getScore();
     const optimalAnswers = history.filter(h => h.answerClass === 'mastery').length;
 
-    await reportQuizResults({
-      user,
-      selectedMode,
-      selectedDomain,
-      history,
-      finalScore,
-      optimalAnswers,
-      questionTimes,
-    });
+    try {
+      await reportQuizResults({
+        user,
+        selectedMode,
+        selectedDomain,
+        history,
+        finalScore,
+        optimalAnswers,
+        questionTimes,
+      });
+    } catch (error) {
+      console.error('Failed to report quiz results:', error);
+    }
 
     setGameState('results');
   };
+
 
   const resetQuiz = () => {
     setEngine(null);
@@ -273,7 +269,6 @@ function App() {
     setFeedback(null);
     setQuestionNumber(0);
     setSessionId(null);
-    setDbSessionId(null);
     setSelectedMode(null);
     setSelectedDomain(null);
     setStreak(0);

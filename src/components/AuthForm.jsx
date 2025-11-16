@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { loginOrRegister } from '../utils/wpAuth';
 
 export function AuthForm({ onAuthSuccess }) {
   const [name, setName] = useState('');
@@ -17,43 +17,18 @@ export function AuthForm({ onAuthSuccess }) {
         throw new Error('Please provide both name and email');
       }
 
-      if (!supabase) {
-        throw new Error('Database connection unavailable');
-      }
+      const { user, token } = await loginOrRegister(name, email);
 
-      const { data: authData, error: signUpError } = await supabase.auth.signUp({
-        email: email,
-        password: `temp_${Date.now()}_${Math.random().toString(36)}`,
-        options: {
-          data: {
-            name: name,
-            display_name: name
-          }
-        }
-      });
+      const userData = {
+        id: user.id,
+        name: user.name || name,
+        email: user.email || email,
+        token: token || null,
+        isGuest: false,
+      };
 
-      if (signUpError) throw signUpError;
-
-      if (authData?.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .upsert({
-            id: authData.user.id,
-            username: name
-          });
-
-        if (profileError) console.error('Profile creation error:', profileError);
-
-        const userData = {
-          id: authData.user.id,
-          name,
-          email,
-          isGuest: false
-        };
-
-        localStorage.setItem('blueprint_user', JSON.stringify(userData));
-        onAuthSuccess(false, true);
-      }
+      localStorage.setItem('blueprint_user', JSON.stringify(userData));
+      onAuthSuccess(false, true);
     } catch (err) {
       console.error('Auth error:', err);
       setError(err.message || 'An error occurred during sign up');
